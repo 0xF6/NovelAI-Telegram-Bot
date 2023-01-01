@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NAIBot", "NAIBot.csproj", "{C74F2E8C-A7D1-482E-92D9-9731F6E1E653}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NAIBot", "NAIBot.csproj", "{13DC56DA-05BF-4DBA-BD54-7DFD46607327}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C74F2E8C-A7D1-482E-92D9-9731F6E1E653}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C74F2E8C-A7D1-482E-92D9-9731F6E1E653}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C74F2E8C-A7D1-482E-92D9-9731F6E1E653}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C74F2E8C-A7D1-482E-92D9-9731F6E1E653}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13DC56DA-05BF-4DBA-BD54-7DFD46607327}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13DC56DA-05BF-4DBA-BD54-7DFD46607327}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13DC56DA-05BF-4DBA-BD54-7DFD46607327}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13DC56DA-05BF-4DBA-BD54-7DFD46607327}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {89FF1707-7106-4BF4-8ADE-E45EE41331DA}
+		SolutionGuid = {C352518F-A9A2-4E3D-9D29-989E7D69B1B0}
 	EndGlobalSection
 EndGlobal

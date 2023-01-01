@@ -137,7 +137,7 @@ public abstract class ImageGenCommand : Command
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
                 document: inpf,
-                caption: $"{seed}, deducted {price} 💎",
+                caption: $"{seed}, paid {price} 💎",
                 parseMode: ParseMode.Html,
                 replyMarkup: inlineKeyboard,
                 cancellationToken: ct);
@@ -150,7 +150,7 @@ public abstract class ImageGenCommand : Command
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
                 document: inpf,
-                caption: $"{seed}, deducted {price} 💎, {GetCrownPrice()} 👑",
+                caption: $"{seed}, paid {price} 💎, {GetCrownPrice()} 👑",
                 parseMode: ParseMode.Html,
                 replyMarkup: inlineKeyboard,
                 cancellationToken: ct);

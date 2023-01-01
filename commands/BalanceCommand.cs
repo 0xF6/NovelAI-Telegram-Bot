@@ -9,7 +9,7 @@ public class BalanceCommand : Command
         await BotClient.SendTextMessageAsync(
             chatId: CharId,
             replyToMessageId: Message.MessageId,
-            text: $"У тебя \n" +
+            text: $"Your balance \n" +
                   $"💎 {User.CrystalCoin}\n" +
                   $"👑 {User.CrownCoin}",
             cancellationToken: ct);

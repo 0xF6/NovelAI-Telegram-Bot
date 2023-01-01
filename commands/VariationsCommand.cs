@@ -97,7 +97,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
             media: files.ToArray(), cancellationToken: ct);
         await BotClient.DeleteMessageAsync(CharId, swg.MessageId, ct);
         await BotClient.SendTextMessageAsync(chatId: CharId, text:
-            $"Variation generated\ndeducted 450 💎",
+            $"Variation generated\npaid 450 💎",
             parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId, cancellationToken: ct);
 
         await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -450);
@@ -162,7 +162,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
                 media: files.ToArray());
 
             await BotClient.SendTextMessageAsync(chatId: CharId, text:
-                $"Variations {context.seed} \n@{Message.ReplyToMessage!.From!.Username}!\n@{User.TgLogin} оплатил {context.price.crystals} 💎, {context.price.crowns} 👑",
+                $"Variations {context.seed} \n@{Message.ReplyToMessage!.From!.Username}!\n@{User.TgLogin} paid {context.price.crystals} 💎, {context.price.crowns} 👑",
                 parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId);
         }
         else
@@ -174,7 +174,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
                 media: files.ToArray());
 
             await BotClient.SendTextMessageAsync(chatId: CharId, text:
-                $"Variations {context.seed} \nCписано {context.price.crystals} 💎, {context.price.crowns} 👑",
+                $"Variations {context.seed} \nPaid {context.price.crystals} 💎, {context.price.crowns} 👑",
                 parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId);
         }
 

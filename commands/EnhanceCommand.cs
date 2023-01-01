@@ -70,7 +70,7 @@ public class EnhanceCommand : Command, IKeyboardProcessor
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
                 document: inpf,
-                caption: $"Enhanced {context.seed} \n@{Message.ReplyToMessage!.From!.Username} [этот пользователь](tg://user?id={User.Id}) оплатил {context.price.crystals} 💎, {context.price.crowns} 👑",
+                caption: $"Enhanced {context.seed} \n@{Message.ReplyToMessage!.From!.Username} @{User.TgLogin} paid {context.price.crystals} 💎, {context.price.crowns} 👑",
                 parseMode: ParseMode.MarkdownV2);
         }
         else
@@ -79,7 +79,7 @@ public class EnhanceCommand : Command, IKeyboardProcessor
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
                 document: inpf,
-                caption: $"Enhanced {context.seed} \nCписано {context.price.crystals} 💎, {context.price.crowns} 👑",
+                caption: $"Enhanced {context.seed} \nPaid {context.price.crystals} 💎, {context.price.crowns} 👑",
                 parseMode: ParseMode.Html);
         }
 
