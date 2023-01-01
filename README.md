@@ -24,6 +24,18 @@ About 👑, its direct of Anlas in your novel ai account, according to this, dis
 For using payment order set up `TELEGRAM_PAYMENT_CURRENCY` (USD, EUR and etc) and `TELEGRAM_PAYMENT_PROVIDER_TOKEN` (getting in bot father in payment menu)
 
 
+
+### Configuration database (optional, you can use local json file, but adapter need implement)      
+
+Create google cloud account and set up Cloud Firestore      
+Create collection `nai` in root of firestore      
+Add document `chats` and insert array with `data` name, its array of telegram IDs chat (private or public)      
+Add document `novalai` and insert field `Token` with your NovelAI account JWT token (expires of 2 week, and getting from Network Tab when execute promt in ImageGeneration tab in novelai.net)        
+Add document `owner` and insert field `id`, its id of your telegram account     
+
+
+For auth with firebase, goo gle to getting ServiceAccount JSON key      
+
 ## Commands
 
 `/balance`    
