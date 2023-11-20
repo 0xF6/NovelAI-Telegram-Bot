@@ -1,6 +1,6 @@
-﻿using NAIBot.locales.dicts;
+﻿using nai.i18n.dicts;
 
-namespace NAIBot.locales;
+namespace nai.i18n;
 
 public class Localization
 {
@@ -8,7 +8,7 @@ public class Localization
 
     public static Dictionary<string, ILocaleContract> _locales = new()
     {
-        { "ru", new RuLocaleContract() },
+        { "ru", new LocaleContract() },
         { "en", new EnLocaleContract() },
         { "ch", new ChLocaleContract() },
         { "fallback", new EnLocaleContract() }

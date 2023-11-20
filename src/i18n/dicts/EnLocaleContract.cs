@@ -1,4 +1,6 @@
-﻿namespace NAIBot.locales.dicts;
+﻿using nai.i18n;
+
+namespace nai.i18n.dicts;
 
 public class EnLocaleContract : ILocaleContract
 {

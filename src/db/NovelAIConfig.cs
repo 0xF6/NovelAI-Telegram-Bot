@@ -1,6 +1,6 @@
 ﻿using Google.Cloud.Firestore;
 
-namespace NAIBot.db;
+namespace nai.db;
 
 [FirestoreData]
 public class NovelAIConfig

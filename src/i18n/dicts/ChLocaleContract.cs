@@ -1,4 +1,6 @@
-﻿namespace NAIBot.locales.dicts;
+﻿using nai.i18n;
+
+namespace nai.i18n.dicts;
 
 public class ChLocaleContract : ILocaleContract
 {
@@ -16,5 +18,5 @@ public class ChLocaleContract : ILocaleContract
     public string AuthSuccess => @"聊天已被授权!";
 
     [Locale(Locales.AuthFailed)]
-    public string AuthFailed => @"授权聊天失败，密码错误。";
+    public string AuthFailed => @"";
 }

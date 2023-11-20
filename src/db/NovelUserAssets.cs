@@ -1,4 +1,4 @@
-﻿namespace NAIBot.db;
+﻿namespace nai.db;
 
 public enum NovelUserAssets
 {

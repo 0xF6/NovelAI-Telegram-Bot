@@ -1,4 +1,4 @@
-﻿namespace NAIBot.locales;
+﻿namespace nai.i18n;
 
 public interface ILocaleContract
 {

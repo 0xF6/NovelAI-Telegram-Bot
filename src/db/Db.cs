@@ -1,22 +1,33 @@
 ﻿using Google.Cloud.Firestore;
 using Telegram.Bot.Types;
 
-namespace NAIBot.db;
+namespace nai.db;
 
 public class Db
 {
     private static State? _state;
     private static bool isLoaded = false;
     public static State State => _state;
-    private static FireStoreAdapter _adapter;
+    private static IDbAdapter _adapter;
+
+    public enum DbKind
+    {
+        Firestore,
+        LiteDb
+    }
 
     public static async ValueTask<State> LoadState()
     {
         if (isLoaded) return _state;
-        _adapter = new FireStoreAdapter();
+
+        if (Config.IsDbActive(DbKind.Firestore))
+            _adapter = new FireStoreAdapter(Config.GetDbPath(DbKind.Firestore));
+        else
+            _adapter = new LiteDbAdapter(Config.GetDbPath(DbKind.LiteDb));
+
+
         _state = new State();
 
-        _state.NovelAI = (await _adapter.Nai.Document("novelai").GetSnapshotAsync()).ConvertTo<NovelAIConfig>();
         var users = await _adapter.Nai.Document("users").Collection("$").ListDocumentsAsync().ToListAsync();
         var snapshots = await Task.WhenAll(users.Select(x => x.GetSnapshotAsync()));
         _state.Users = snapshots.Select(x => x.ConvertTo<NovelUser>()).ToList();
@@ -26,8 +37,7 @@ public class Db
             _state.AllowedChatList = chatsSnapshot.GetValue<List<long>>("data");
         else
             await _adapter.Nai.Document("chats").CreateAsync(new { data = new List<long>() });
-        var adminSnapshot = await _adapter.Nai.Document("owner").GetSnapshotAsync();
-        _state.MainAdministrator = adminSnapshot.GetValue<long>("id");
+
         isLoaded = true;
         return _state;
     }
@@ -63,17 +73,9 @@ public class Db
     }
 
 
-    public static void SetNovelAIEngine(string model)
-    {
-        State.NovelAI.Model = model;
-    }
-
     public static long CalculatePrice(NovelAIParams novelAIParams)
         => 6; // TODO
-
-    public static string GetNovelAIToken()
-        => State.NovelAI.Token;
-
+    
     public static async ValueTask SaveUser(NovelUser novelUser)
     {
         if (novelUser.TgLogin is null)
