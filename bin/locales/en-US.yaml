@@ -1,0 +1,12 @@
+﻿StartMessage: |
+    Hi! 🔥
+    I am a bot for generating images based on the Novela engine 👑
+    The bot is paid, but is available in the chat @novelai_generation_chat
+    If you bought an authorization code, use the /authorize_chat command
+    Commands and their description: https://t.me/novelai_generation_chat/1891
+SentAuthRequest: |
+    Authorization request has been sent, request code from @ivysola
+AuthSuccess: |
+    Chat has been authorized!
+AuthFailed: |
+    Failed authorization chat, bad passcode.
