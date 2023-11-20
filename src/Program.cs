@@ -1,6 +1,6 @@
-﻿using NAIBot;
-using NAIBot.commands;
-using NAIBot.db;
+﻿using nai;
+using nai.commands;
+using nai.db;
 using System.Runtime.InteropServices;
 using System.Text;
 using Telegram.Bot;
@@ -10,13 +10,13 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.Payments;
 
+Config.Init();
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     Console.OutputEncoding = Encoding.Unicode;
 
-var token = Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN") 
-            ?? throw new Exception("no token bot defined in env");
+var token = Config.TelegramBotToken;
 
 using CancellationTokenSource cts = new();
 
@@ -47,7 +47,7 @@ if (Environment.GetEnvironmentVariable("TELEGRAM_BOT_MODE_OF_CHANNEL") is not nu
         Console.WriteLine("Enter text");
         var text = Console.ReadLine();
 
-        await botClient.SendTextMessageAsync(long.Parse(charId), text, ParseMode.Html);
+        await botClient.SendTextMessageAsync(long.Parse(charId), text, parseMode: ParseMode.Html);
     }
     return;
 }
@@ -157,6 +157,13 @@ async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, Cancellation
 
     if (command is not { })
         return;
+
+    if (!Config.CommandIsActive(command))
+    {
+        Console.WriteLine($"Command {command.GetType().Name} is not active");
+        return;
+    }
+
     if (command.OnlyPrivateChat && message.Chat.Type != ChatType.Private)
         return;
     if (command.IsTrusted && !Db.ChatIsAllowed(chatId))

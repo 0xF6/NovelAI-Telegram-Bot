@@ -1,7 +1,7 @@
-﻿using NAIBot.db;
+﻿using nai.db;
 using Telegram.Bot;
 
-namespace NAIBot.commands;
+namespace nai.commands;
 
 public abstract class PayCommand : Command
 {

@@ -1,4 +1,4 @@
-﻿namespace NAIBot;
+﻿namespace nai;
 
 public class EngineQueue
 {

@@ -1,11 +1,11 @@
 ﻿using Flurl.Http;
-using NAIBot;
-using NAIBot.db;
-using NAIBot.nai;
+using nai;
+using nai.db;
+using nai.nai;
 using RandomGen;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types.ReplyMarkups;
 using File = System.IO.File;
 
@@ -116,7 +116,7 @@ public abstract class ImageGenCommand : Command
 
         using var stream = new MemoryStream(bytes);
 
-        var inpf = new InputOnlineFile(stream, $"{seed}.png");
+        var inpf = InputFile.FromStream(stream, $"{seed}.png");
         
 
         InlineKeyboardMarkup inlineKeyboard = new(new[]

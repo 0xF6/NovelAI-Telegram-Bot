@@ -1,8 +1,8 @@
-﻿using NAIBot.locales;
+﻿using nai.i18n;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
-namespace NAIBot.commands;
+namespace nai.commands;
 
 public class StartCommand : Command
 {
@@ -17,5 +17,5 @@ public class StartCommand : Command
 
 
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
-        => await BotClient.SendTextMessageAsync(Message.Chat.Id, Locale.Get(Locales.MessageStart), ParseMode.Html, cancellationToken: ct);
+        => await BotClient.SendTextMessageAsync(Message.Chat.Id, Locale.Get(Locales.MessageStart), parseMode: ParseMode.Html, cancellationToken: ct);
 }

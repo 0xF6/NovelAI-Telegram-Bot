@@ -2,7 +2,7 @@
 using RandomGen;
 using Telegram.Bot;
 
-namespace NAIBot.commands;
+namespace nai.commands;
 
 public class Img2ImgP : ImageGenCommand
 {

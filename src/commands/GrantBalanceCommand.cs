@@ -1,4 +1,4 @@
-﻿using NAIBot.db;
+﻿using nai.db;
 using Telegram.Bot;
 
 public class GrantBalanceCommand : Command

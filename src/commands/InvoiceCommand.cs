@@ -1,7 +1,7 @@
 ﻿using Telegram.Bot.Types.Payments;
 using Telegram.Bot;
 
-namespace NAIBot.commands;
+namespace nai.commands;
 
 public class InvoiceCommand : Command
 {

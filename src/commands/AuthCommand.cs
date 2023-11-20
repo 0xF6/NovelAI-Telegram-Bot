@@ -1,10 +1,10 @@
-﻿using NAIBot.db;
-using NAIBot.locales;
+﻿using nai.db;
+using nai.i18n;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace NAIBot.commands;
+namespace nai.commands;
 
 public class AuthCommand : Command, IKeyboardProcessor
 {
@@ -39,7 +39,14 @@ public class AuthCommand : Command, IKeyboardProcessor
         
         Console.WriteLine(allowedKey);
 
-        await BotClient.SendTextMessageAsync(Db.State.MainAdministrator, $"Запрос авторизации от \\@{Message.From!.Username} \\([User {Message.From!.FirstName} {Message.From!.LastName}](tg://user?id={Message.From!.Id})\\)\nCode: {allowedKey}", ParseMode.MarkdownV2, cancellationToken: ct);
+        if (Config.MainAdministrator == 0)
+        {
+            Console.WriteLine($"No main administrator has been defined");
+            return;
+        }
+
+
+        await BotClient.SendTextMessageAsync(Config.MainAdministrator, $"Запрос авторизации от \\@{Message.From!.Username} \\([User {Message.From!.FirstName} {Message.From!.LastName}](tg://user?id={Message.From!.Id})\\)\nCode: {allowedKey}", parseMode:ParseMode.MarkdownV2, cancellationToken: ct);
 
         Shuffle(keys);
 

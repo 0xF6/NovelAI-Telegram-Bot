@@ -1,12 +1,12 @@
 ﻿using Flurl.Http;
-using NAIBot.db;
-using NAIBot.nai;
+using nai.db;
+using nai.nai;
 using RandomGen;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.InputFiles;
 
-namespace NAIBot.commands;
+namespace nai.commands;
 
 public class EnhanceCommand : Command, IKeyboardProcessor
 {
@@ -62,7 +62,8 @@ public class EnhanceCommand : Command, IKeyboardProcessor
 
         using var stream = new MemoryStream(bytes);
 
-        var inpf = new InputOnlineFile(stream, $"{context.seed}.enhanced.png");
+        
+        var inpf = InputFile.FromStream(stream, $"{context.seed}.enhanced.png");
 
         if (Message.ReplyToMessage!.From!.Id != User.Id)
         {

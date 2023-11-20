@@ -1,5 +1,5 @@
-﻿using NAIBot.db;
-using NAIBot.locales;
+﻿using nai.db;
+using nai.i18n;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 

@@ -1,12 +1,12 @@
 ﻿using Flurl.Http;
+using nai.db;
+using nai.nai;
 using RandomGen;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using NAIBot.db;
-using NAIBot.nai;
 
-namespace NAIBot.commands;
+namespace nai.commands;
 
 public class VariationsCommand : Command, IKeyboardProcessor
 {
@@ -82,7 +82,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
             var stream = new MemoryStream(bytes);
             disposable.Add(stream);
 
-            files.Add(new InputMediaDocument(new InputMedia(stream, $"{aIinput.parameters.seed}.png")));
+            files.Add(new InputMediaDocument(InputFile.FromStream(stream, $"{aIinput.parameters.seed}.png")));
 
             Console.WriteLine($"Generated {aIinput.parameters.seed}.png");
             await Task.Delay(3000, ct);
@@ -151,7 +151,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
             var stream = new MemoryStream(x);
             toDispose.Add(stream);
             await System.IO.File.WriteAllBytesAsync($"{context.pngPath}.variant.{i}.png", x);
-            files.Add(new InputMediaDocument(new InputMedia(stream, $"{context.seed}.variant.{i}.png")));
+            files.Add(new InputMediaDocument(InputFile.FromStream(stream, $"{context.seed}.variant.{i}.png")));
         }
 
         if (Message.ReplyToMessage!.From!.Id != User.Id)
