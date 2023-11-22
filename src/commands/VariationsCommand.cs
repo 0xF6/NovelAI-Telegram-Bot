@@ -122,7 +122,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
             strength = 0.8f,
             noise = 0.1f,
             n_samples = 3,
-            stems = 50
+            steps = 50
         };
 
         var promt = new NovelAIinput("safe-diffusion", pams) { input = context.config };

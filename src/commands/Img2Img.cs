@@ -52,7 +52,7 @@ public class Img2ImgP : ImageGenCommand
             input.parameters.noise = 0.05f;
 
         input.parameters.image = Convert.ToBase64String(mem.ToArray());
-        input.parameters.stems = 50;
+        input.parameters.steps = 50;
         
     }
 

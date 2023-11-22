@@ -1,4 +1,5 @@
 ﻿using Flurl.Http;
+using Ionic.Zip;
 using nai;
 using nai.db;
 using nai.nai;
@@ -8,6 +9,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using File = System.IO.File;
+// ReSharper disable ComplexConditionExpression
 
 public abstract class ImageGenCommand : Command
 {
@@ -19,7 +21,7 @@ public abstract class ImageGenCommand : Command
 
     protected virtual int GetAdditionalPrice() => 0;
     protected virtual int GetCrownPrice() => 0;
-    protected virtual string GetEngineName() => "safe-diffusion"; 
+    protected string GetEngineName() => Config.NovelAiEngine; 
 
 
     protected virtual ValueTask OnFillAdditionalData(NovelAIinput input) 
@@ -51,7 +53,7 @@ public abstract class ImageGenCommand : Command
         pams.width = GetSize().x;
         pams.height = GetSize().y;
 
-        var price = Db.CalculatePrice(pams) + GetAdditionalPrice();
+        var price = Db.CalculatePrice(NovelAIEngine.ByKey(GetEngineName()), pams) + GetAdditionalPrice();
 
         if (!User.IsAllowExecute(price))
         {
@@ -73,8 +75,8 @@ public abstract class ImageGenCommand : Command
             return;
         }
 
-        if (!await OnValidate())
-            return;
+        //if (!await OnValidate())
+        //    return;
 
         var novelAI = new NovelAI();
 
@@ -85,49 +87,33 @@ public abstract class ImageGenCommand : Command
 
         await OnFillAdditionalData(promt);
 
-        var result = await novelAI
-            .Request()
-            .AllowAnyHttpStatus()
-            .PostJsonAsync(promt, cancellationToken: ct);
+        var stream = await novelAI.GenerateRequest(BotClient, CharId, Message, promt, ct);
 
-        if (result.StatusCode is not (200 or 201))
-        {
-            var strerr = await result.GetStringAsync();
-            await BotClient.SendTextMessageAsync(
-                chatId: CharId,
-                replyToMessageId: Message.MessageId,
-                text: $"Unhandled error\n{result.StatusCode}, {strerr}, seed: {seed}",
-                cancellationToken: ct);
+
+        if (stream is null)
             return;
-        }
 
-        var str = await result.GetStringAsync();
-        var entities = str.Split('\n');
-        var data = entities[2].Replace("data:", "");
-        var bytes = Convert.FromBase64String(data);
 
         if (!Directory.Exists($"images/{User.Id}/"))
             Directory.CreateDirectory($"images/{User.Id}/");
         var flsName = Guid.NewGuid().ToString("N");
         var pngPath = $"images/{User.Id}/{flsName}.png";
-        await File.WriteAllBytesAsync(pngPath, bytes, ct);
+        await File.WriteAllBytesAsync(pngPath, stream.ToArray(), ct);
         await File.WriteAllTextAsync($"images/{User.Id}/{flsName}.png.seed", seed.ToString(), ct);
         await File.WriteAllTextAsync($"images/{User.Id}/{flsName}.png.config", cmdText, ct);
-
-        using var stream = new MemoryStream(bytes);
-
-        var inpf = InputFile.FromStream(stream, $"{seed}.png");
         
+        var inpf = InputFile.FromStream(stream, $"{seed}.png");
+
 
         InlineKeyboardMarkup inlineKeyboard = new(new[]
         {
             new []
             {
-                CreateAction($"Enhance [14👑 + {price * 2}💎]", KeyboardAction.Enhance, seed, cmdText, pngPath, (price * 2, 14))
+                CreateAction($"Enhance [14👑 + {price + (price * 0.3)}💎]", KeyboardAction.Enhance, seed, cmdText, pngPath, (price + (int)(price * 0.3), 14))
             },
             new []
             {
-                CreateAction($"Variations [18👑 + {price * 4}💎]", KeyboardAction.Variations, seed, cmdText, pngPath, (price * 4, 18))
+                CreateAction($"Variations [18👑 + {price * 3}💎]", KeyboardAction.Variations, seed, cmdText, pngPath, (price * 3, 18))
             }
         });
 

@@ -43,26 +43,13 @@ public class EnhanceCommand : Command, IKeyboardProcessor
         {
             input = context.config
         };
-        var result = await novelAI
-            .Request()
-            .AllowAnyHttpStatus()
-            .PostJsonAsync(promt);
 
-        if (result.StatusCode is not (200 or 201))
-        {
-            var strerr = await result.GetStringAsync();
-            Console.WriteLine(strerr);
+
+        var stream = await novelAI.GenerateRequest(BotClient, CharId, Message, promt);
+
+        if (stream is null)
             return;
-        }
 
-        var str = await result.GetStringAsync();
-        var entities = str.Split('\n');
-        var data = entities[2].Replace("data:", "");
-        var bytes = Convert.FromBase64String(data);
-
-        using var stream = new MemoryStream(bytes);
-
-        
         var inpf = InputFile.FromStream(stream, $"{context.seed}.enhanced.png");
 
         if (Message.ReplyToMessage!.From!.Id != User.Id)
@@ -84,7 +71,7 @@ public class EnhanceCommand : Command, IKeyboardProcessor
                 parseMode: ParseMode.Html);
         }
 
-        await System.IO.File.WriteAllBytesAsync($"{context.pngPath}.enhanced.png", bytes);
+        await System.IO.File.WriteAllBytesAsync($"{context.pngPath}.enhanced.png", stream.ToArray());
 
         await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -context.price.crystals);
         await User.GrantCoinsAsync(NovelUserAssets.CROWN, -context.price.crowns);

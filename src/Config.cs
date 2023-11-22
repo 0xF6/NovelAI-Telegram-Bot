@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
-using System.Runtime.CompilerServices;
-using nai.db;
-using static Google.Protobuf.WellKnownTypes.Field.Types;
+﻿namespace nai;
 
-namespace nai;
+using Microsoft.Extensions.Configuration;
+using System.Runtime.CompilerServices;
+using db;
 
 public static class Config
 {
@@ -11,7 +10,8 @@ public static class Config
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(new DirectoryInfo("./").FullName)
-            .AddJsonFile("config.json");
+            .AddYamlFile("config.yml")
+            .AddEnvironmentVariables();
         Root = builder.Build();
 
 
@@ -41,8 +41,14 @@ public static class Config
 
     public static bool ModeOfChannel => bool.Parse(GetValue());
 
-    public static string NovelAIToken => GetValue();
+    public static string NovelAI_Username => GetValue();
     public static long MainAdministrator => long.Parse(GetValue());
+
+    public static string NovelAIToken => GetValue();
+
+    public static string PythonDllPath => GetValue();
+    public static string CrystallFormula => Root.GetSection("Nai").GetSection("CrystallFormula").Value;
+    public static string NovelAiEngine => Root.GetSection("Nai").GetSection("SelectedModel").Value;
 
 
     public static bool CommandIsActive(Command command) 

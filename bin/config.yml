@@ -1,0 +1,52 @@
+---
+TelegramBotToken:
+ModeOfChannel: false
+MainAdministrator:
+
+Database:
+  Firestore:
+    IsActive: false
+    ConnectionString: ProjectId://nai
+    CredentialPath: 
+  LiteDB:
+    IsActive: true
+    ConnectionString: nai.db
+
+Commands:
+  PortraitNsfwImageGenCommand: true
+  PortraitSfwImageGenCommand: true
+  LandNsfwImageGenCommand: true
+  LandSfwImageGenCommand: true
+  BalanceCommand: true
+  GrantBalanceCommand: true
+  EnhanceCommand: true
+  VariationsCommand: true
+  Img2ImgP: true
+  PayCrownCommand: true
+  PayCrystalCommand: true
+  ExchangeCommand: true
+  InvoiceCommand: true
+  AuthCommand: true
+  StartCommand: true
+
+
+Nai:
+    Username:
+    Password:
+    #    model name       |           description            |   Anlas Price (default promt settings wihout subscribes)
+    # safe-diffusion      - NAI Diffusion Anime V1 (Curated) -  5
+    # nai-diffusion       - NAI Diffusion Anime V1 (Full)    -  5
+    # nai-diffusion-furry - NAI Diffusion Furry              -  5
+    # nai-diffusion-2     - NAI Diffusion Anime V2           - 13
+    # nai-diffusion-3     - NAI Diffusion Anime V3           - 30
+    DefaultNegateTags:
+        Actual: "lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
+        Legacy: "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
+    SelectedModel: nai-diffusion
+    
+
+
+    CrystallFormula: "round((map([step], 1, 50, [minAnlas], [maxAnlas]) + map([quality], 4096, 3145728, 2, 136)) / 2)"
+    EnhanceFormula: "round(price + (price * 0.6))"
+    VariationFormula: "price * 3"
+    SeedFormula: "l(0, pow(2, 32) - 1)"
