@@ -1,4 +1,6 @@
-﻿using Google.Cloud.Firestore;
+﻿using System.Numerics;
+using Google.Cloud.Firestore;
+using nai.nai;
 using Telegram.Bot.Types;
 
 namespace nai.db;
@@ -73,8 +75,11 @@ public class Db
     }
 
 
-    public static long CalculatePrice(NovelAIParams novelAIParams)
-        => 6; // TODO
+    public static long CalculatePrice(NovelAIEngine engine, NovelAIParams @params)
+    {
+        var formula = new Formula(Config.CrystallFormula);
+        return formula.GetPrice(engine, @params.steps, new Vector2(@params.width, @params.height));
+    }
     
     public static async ValueTask SaveUser(NovelUser novelUser)
     {

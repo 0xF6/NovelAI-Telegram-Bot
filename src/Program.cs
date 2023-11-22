@@ -1,6 +1,7 @@
 ﻿using nai;
 using nai.commands;
 using nai.db;
+using nai.nai;
 using System.Runtime.InteropServices;
 using System.Text;
 using Telegram.Bot;
@@ -9,6 +10,7 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.Payments;
+
 
 Config.Init();
 

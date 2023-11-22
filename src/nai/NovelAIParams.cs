@@ -11,7 +11,7 @@ public record NovelAIParams(
     public string uc =
         "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, bad feet, futa, futanari, yaoi,huge_breasts, large_breasts";
 
-    public int stems = 28;
+    public int steps = 28;
     public int width = 512;
     public int height = 768;
     public long seed = -1;
