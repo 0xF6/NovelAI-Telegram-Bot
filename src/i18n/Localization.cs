@@ -1,18 +1,11 @@
-﻿using nai.i18n.dicts;
+﻿namespace nai.i18n;
 
-namespace nai.i18n;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 public class Localization
 {
     private readonly string _code;
-
-    public static Dictionary<string, ILocaleContract> _locales = new()
-    {
-        { "ru", new LocaleContract() },
-        { "en", new EnLocaleContract() },
-        { "ch", new ChLocaleContract() },
-        { "fallback", new EnLocaleContract() }
-    };
 
     public Localization(string code) => _code = code;
 
@@ -22,10 +15,30 @@ public class Localization
         => string.Format(FetchContract(_code).Get(key), args);
 
 
-    public static ILocaleContract FetchContract(string key)
+    private readonly Dictionary<string, LocaleContract> _locales = new();
+
+    public void Load()
     {
-        if (_locales.ContainsKey(key))
-            return _locales[key];
-        return _locales["fallback"];
+        var dir = new DirectoryInfo("./locales");
+
+        var deserializer = new DeserializerBuilder()
+            //.WithNamingConvention(UnderscoredNamingConvention.Instance)  // see height_in_inches in sample yml 
+            .Build();
+
+        foreach (var file in dir.EnumerateFiles("*.yaml"))
+        {
+            var all = File.ReadAllText(file.FullName);
+            var contract = deserializer.Deserialize<LocaleContract>(all);
+            _locales.Add(file.Name.Replace(file.Extension, ""), contract);
+            Console.WriteLine($"Loaded '{file.Name}'");
+        }
+    }
+
+
+    public ILocaleContract FetchContract(string key)
+    {
+        if (_locales.TryGetValue(key, out var contract))
+            return contract;
+        return _locales["en-US"];
     }
 }

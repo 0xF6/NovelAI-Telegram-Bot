@@ -1,4 +1,4 @@
-﻿namespace nai.i18n.dicts;
+﻿namespace nai.i18n;
 
 public class LocaleContract : ILocaleContract
 {
