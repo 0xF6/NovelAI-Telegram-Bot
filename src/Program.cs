@@ -1,7 +1,6 @@
 ﻿using nai;
 using nai.commands;
 using nai.db;
-using nai.nai;
 using System.Runtime.InteropServices;
 using System.Text;
 using Telegram.Bot;
@@ -10,6 +9,7 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.Payments;
+
 
 
 Config.Init();
@@ -66,9 +66,7 @@ var commands = new List<Command>()
     new EnhanceCommand(),
     new VariationsCommand(),
     new Img2ImgP(),
-    new PayCrownCommand(),
-    new PayCrystalCommand(),
-    new ExchangeCommand(),
+    new PayCommand(),
     new AuthCommand(),
     new InvoiceCommand(),
     new StartCommand()
@@ -218,17 +216,12 @@ async Task ProcessQuery(ITelegramBotClient bot, CallbackQuery upd)
     if (table is null)
         return;
 
-    if (!user.IsAllowExecute(table.price.crystals))
+    if (!user.IsAllowExecute(table.price))
     {
         await bot.AnswerCallbackQueryAsync(upd.Id, $"У тебя не достаточно 💎");
         return;
     }
 
-    if (!user.IsAllowExecuteByCrown(table.price.crowns))
-    {
-        await bot.AnswerCallbackQueryAsync(upd.Id, $"У тебя не достаточно 👑");
-        return;
-    }
 
     var command = commands.OfType<IKeyboardProcessor>().FirstOrDefault(x => x.Action == table.action);
 

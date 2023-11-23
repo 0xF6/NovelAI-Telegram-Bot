@@ -1,7 +1,7 @@
 ﻿public record NovelAIinput(string model, NovelAIParams parameters)
 {
-    public string input;
-    public string action = "generate";
+    public string input { get; set; }
+    public string action { get; set; } = "generate";
 }
 
 // V3

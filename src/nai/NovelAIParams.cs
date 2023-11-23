@@ -1,20 +1,30 @@
-﻿using Newtonsoft.Json;
+﻿using nai;
+using Newtonsoft.Json;
 
-public record NovelAIParams(
-    bool qualityToggle = true,
-    int scale = 11,
-    string sampler = "k_euler_ancestral",
-    int n_samples = 1,
-    int ucPreset = 0
-)
+public record NovelAIParams
 {
-    public string uc =
-        "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, bad feet, futa, futanari, yaoi,huge_breasts, large_breasts";
+    private NovelAIParams(){}
 
-    public int steps = 28;
-    public int width = 512;
-    public int height = 768;
-    public long seed = -1;
+    public int width { get; set; } = 512;
+    public int height { get; set; } = 768;
+    public int scale { get; set; } = 11;
+    public string sampler { get; set; }
+    public int steps { get; set; } = 28;
+    public long seed { get; set; } = -1;
+    public int n_samples { get; set; } = 1;
+    public int ucPreset { get; set; } = 0;
+    public bool qualityToggle { get; set; } = true;
+    public bool sm { get; set; } = false;
+    public bool sm_dyn { get; set; } = false;
+    public bool dynamic_thresholding { get; set; } = false;
+    public int controlnet_strength { get; set; }
+    public bool legacy { get; set; } = false;
+    public bool add_original_image { get; set; }
+    public string negative_prompt { get; set; }
+
+
+
+
 
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public string image { get; set; }
@@ -22,4 +32,28 @@ public record NovelAIParams(
     public float? strength { get; set; }
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public float? noise { get; set; }
+
+
+    public static NovelAIParams Create(NaiSettings settings, long seed)
+    {
+        return new NovelAIParams()
+        {
+            steps = settings.defaultStep,
+            add_original_image = false,
+            controlnet_strength = settings.controlnet_strength,
+            dynamic_thresholding = settings.dynamic_thresholding,
+            n_samples = 1,
+            negative_prompt = settings.Engine.isActual
+                ? settings.DefaultNegateTags.Actual
+                : settings.DefaultNegateTags.Legacy,
+            qualityToggle = settings.qualityToggle,
+            sampler = settings.SelectedSampler,
+            scale = settings.Guidance,
+            sm = settings.SMEA,
+            sm_dyn = settings.DYN,
+            ucPreset = settings.ucPreset,
+            legacy = false,
+            seed = seed
+        };
+    }
 }

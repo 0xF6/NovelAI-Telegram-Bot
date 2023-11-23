@@ -7,13 +7,13 @@ using Telegram.Bot.Types;
 namespace nai.nai;
 
 
-public record NovelAIEngine(string key, long minPrice, long maxPrice)
+public record NovelAIEngine(string key, long minPrice, long maxPrice, bool isActual)
 {
-    public static NovelAIEngine SafeDiffusion = new("safe-diffusion", 2, 8);
-    public static NovelAIEngine NaiDiffusion = new("nai-diffusion", 2, 8);
-    public static NovelAIEngine NaiFurry = new("nai-diffusion-furry", 2, 8);
-    public static NovelAIEngine NaiV2 = new("nai-diffusion-2", 2, 24);
-    public static NovelAIEngine NaiV3 = new("nai-diffusion-3", 4, 33);
+    public static NovelAIEngine SafeDiffusion = new("safe-diffusion", 2, 8, false);
+    public static NovelAIEngine NaiDiffusion = new("nai-diffusion", 2, 8, false);
+    public static NovelAIEngine NaiFurry = new("nai-diffusion-furry", 2, 8, false);
+    public static NovelAIEngine NaiV2 = new("nai-diffusion-2", 2, 24, false);
+    public static NovelAIEngine NaiV3 = new("nai-diffusion-3", 4, 33, true);
 
     public static List<NovelAIEngine> All = new List<NovelAIEngine>()
         { SafeDiffusion, NaiDiffusion, NaiFurry, NaiV2, NaiV3 };
@@ -40,7 +40,7 @@ public class NovelAI
         => flurl.Request();
 
 
-    public async Task<MemoryStream?> GenerateRequest(ITelegramBotClient botClient, long chatId, Message message, NovelAIinput input, CancellationToken ct = default)
+    public async Task<List<MemoryStream>> GenerateRequest(ITelegramBotClient botClient, long chatId, Message message, NovelAIinput input, CancellationToken ct = default)
     {
         var result = await this
             .Request()
@@ -55,35 +55,27 @@ public class NovelAI
                 replyToMessageId: message.MessageId,
                 text: $"Unhandled error\n{result.StatusCode}, {strerr}, seed: {input.parameters.seed}",
                 cancellationToken: ct);
-            return null;
+            return new List<MemoryStream>();
         }
 
 
         using var zip = ZipFile.Read(await result.GetStreamAsync());
 
+        var list = new List<MemoryStream>();
 
-        var element = zip.FirstOrDefault();
-
-
-        if (element is null)
+        foreach (var e in zip)
         {
-            await botClient.SendTextMessageAsync(
-                chatId: chatId,
-                replyToMessageId: message.MessageId,
-                text: $"Unhandled error\n{result.StatusCode}, response from novel ai is empty, seed: {input.parameters.seed}",
-                cancellationToken: ct);
-            return null;
+            await using var reader = e.OpenReader();
+            var stream = new MemoryStream();
+            Console.WriteLine($"Received {e.FileName}");
+
+            await reader.CopyToAsync(stream, ct);
+
+            stream.Position = 0;
+
+
+            list.Add(stream);
         }
-
-        await using var reader = element.OpenReader();
-        var stream = new MemoryStream();
-
-        await reader.CopyToAsync(stream, ct);
-
-        stream.Position = 0;
-
-        Console.WriteLine($"Received {element.FileName}");
-
-        return stream;
+        return list;
     }
 }
