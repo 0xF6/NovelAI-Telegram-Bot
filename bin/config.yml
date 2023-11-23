@@ -22,9 +22,7 @@ Commands:
   EnhanceCommand: true
   VariationsCommand: true
   Img2ImgP: true
-  PayCrownCommand: true
-  PayCrystalCommand: true
-  ExchangeCommand: true
+  PayCommand: true
   InvoiceCommand: true
   AuthCommand: true
   StartCommand: true
@@ -42,11 +40,28 @@ Nai:
     DefaultNegateTags:
         Actual: "lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
         Legacy: "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
+    SfwNegateTags: "nsfw, nude, naked"
     SelectedModel: nai-diffusion
-    
-
+    # k_euler_ancestral
+    # k_dpmpp_2m
+    # k_euler
+    # k_dpm_2
+    # k_dpmpp_2s_ancestral
+    # k_dpmpp_sde
+    # k_dpm_fast
+    # ddim
+    SelectedSampler: k_euler_ancestral
+    SMEA: false
+    DYN: false
+    Guidance: 11
+    ucPreset: 0
+    qualityToggle: true
+    dynamic_thresholding: false
+    controlnet_strength: 1
+    defaultStep: 28
 
     CrystallFormula: "round((map([step], 1, 50, [minAnlas], [maxAnlas]) + map([quality], 4096, 3145728, 2, 136)) / 2)"
     EnhanceFormula: "round(price + (price * 0.6))"
     VariationFormula: "price * 3"
     SeedFormula: "l(0, pow(2, 32) - 1)"
+    VariationSize: 4

@@ -25,31 +25,27 @@ public class EnhanceCommand : Command, IKeyboardProcessor
 
     public async ValueTask ProcessAction(KeyboardImageGeneratorData context)
     {
-        var uints = Gen.Random.Numbers.Longs(0, (long)(Math.Pow(2, 32) - 1));
-        var seed = uints();
+        var settings = Config.GetNaiSettings();
 
         var novelAI = new NovelAI();
-        var pams = new NovelAIParams
-        {
-            seed = seed, //context.seed,
-            height = (int)(context.size.width * 1.5),
-            width = (int)(context.size.height * 1.5),
-            image = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(context.pngPath)),
-            strength = 0.7f,
-            noise = 0.2f
-        };
 
-        var promt = new NovelAIinput("safe-diffusion", pams)
+        var @params = NovelAIParams.Create(settings, context.seed);
+
+        @params.height = (int)(context.size.width * 1.5);
+        @params.width = (int)(context.size.height * 1.5);
+        @params.image = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(context.pngPath));
+        @params.strength = 0.7f;
+        @params.noise = 0.2f;
+
+        var input = new NovelAIinput(settings.SelectedModel, @params)
         {
             input = context.config
         };
 
 
-        var stream = await novelAI.GenerateRequest(BotClient, CharId, Message, promt);
-
-        if (stream is null)
-            return;
-
+        var results = await novelAI.GenerateRequest(BotClient, CharId, Message, input);
+        using var stream = results.Single();
+        
         var inpf = InputFile.FromStream(stream, $"{context.seed}.enhanced.png");
 
         if (Message.ReplyToMessage!.From!.Id != User.Id)
@@ -58,7 +54,7 @@ public class EnhanceCommand : Command, IKeyboardProcessor
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
                 document: inpf,
-                caption: $"Enhanced {context.seed} \n@{Message.ReplyToMessage!.From!.Username} @{User.TgLogin} paid {context.price.crystals} 💎, {context.price.crowns} 👑",
+                caption: $"Enhanced {context.seed} \n@{Message.ReplyToMessage!.From!.Username} @{User.TgLogin} paid {context.price} 💎",
                 parseMode: ParseMode.MarkdownV2);
         }
         else
@@ -67,14 +63,13 @@ public class EnhanceCommand : Command, IKeyboardProcessor
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
                 document: inpf,
-                caption: $"Enhanced {context.seed} \nPaid {context.price.crystals} 💎, {context.price.crowns} 👑",
+                caption: $"Enhanced {context.seed} \nPaid {context.price} 💎",
                 parseMode: ParseMode.Html);
         }
 
         await System.IO.File.WriteAllBytesAsync($"{context.pngPath}.enhanced.png", stream.ToArray());
 
-        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -context.price.crystals);
-        await User.GrantCoinsAsync(NovelUserAssets.CROWN, -context.price.crowns);
+        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -context.price);
     }
 
     public KeyboardAction Action => KeyboardAction.Enhance;

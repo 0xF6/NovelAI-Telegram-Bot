@@ -54,18 +54,18 @@ public class AuthCommand : Command, IKeyboardProcessor
         {
             new []
             {
-                CreateAction(keys[0], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[0]), keys[0], $"{allowedKey}", (0, 0)),
-                CreateAction(keys[1], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[1]), keys[1], $"{allowedKey}", (0, 0)),
+                CreateAction(keys[0], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[0]), keys[0], $"{allowedKey}", (0)),
+                CreateAction(keys[1], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[1]), keys[1], $"{allowedKey}", (0)),
             },
             new []
             {
-                CreateAction(keys[2], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[2]), keys[2], $"{allowedKey}", (0, 0)),
-                CreateAction(keys[3], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[3]), keys[3], $"{allowedKey}", (0, 0)),
+                CreateAction(keys[2], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[2]), keys[2], $"{allowedKey}", (0)),
+                CreateAction(keys[3], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[3]), keys[3], $"{allowedKey}", (0)),
             },
             new []
             {
-                CreateAction(keys[4], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[4]), keys[4], $"{allowedKey}", (0, 0)),
-                CreateAction(keys[5], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[5]), keys[5], $"{allowedKey}", (0, 0)),
+                CreateAction(keys[4], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[4]), keys[4], $"{allowedKey}", (0)),
+                CreateAction(keys[5], KeyboardAction.AuthCodeSegment, FindIndex(allowedKeyArr, keys[5]), keys[5], $"{allowedKey}", (0)),
             }
         });
 
@@ -101,7 +101,7 @@ public class AuthCommand : Command, IKeyboardProcessor
         }
     }
 
-    private InlineKeyboardButton CreateAction(string title, KeyboardAction action, long seed, string config, string pngPath, (long crystals, long crowns) price) =>
+    private InlineKeyboardButton CreateAction(string title, KeyboardAction action, long seed, string config, string pngPath, long price) =>
         InlineKeyboardButton.WithCallbackData(text: title,
             callbackData: new ActionTable().Create(new KeyboardImageGeneratorData(pngPath, seed, config, action, price, (Message.Chat.Id, User.Id))).ToString("N"));
 

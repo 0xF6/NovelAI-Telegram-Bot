@@ -2,6 +2,5 @@
 
 public enum NovelUserAssets
 {
-    CRYSTAL,
-    CROWN
+    CRYSTAL
 }

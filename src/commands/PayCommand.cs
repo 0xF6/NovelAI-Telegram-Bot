@@ -3,9 +3,9 @@ using Telegram.Bot;
 
 namespace nai.commands;
 
-public abstract class PayCommand : Command
+public class PayCommand : Command
 {
-    public abstract NovelUserAssets GetSelectedAsset();
+    public override List<string> Aliases => new() { "/pay" };
 
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
     {
@@ -19,12 +19,12 @@ public abstract class PayCommand : Command
         var loginFrom = Message.From!.Username;
         var loginTo = tgUser.Username;
 
-        if (!User.IsAllowExecute(balance, GetSelectedAsset()))
+        if (!User.IsAllowExecute(balance, NovelUserAssets.CRYSTAL))
         {
             await BotClient.SendTextMessageAsync(
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
-                text: $"Insufficient balance of  {GetSelectedAsset().GetEmojiFor()}",
+                text: $"Insufficient balance of  {NovelUserAssets.CRYSTAL.GetEmojiFor()}",
                 cancellationToken: ct);
             return;
         }
@@ -32,24 +32,11 @@ public abstract class PayCommand : Command
         await BotClient.SendTextMessageAsync(
             chatId: CharId,
             replyToMessageId: Message.MessageId,
-            text: $"@{loginFrom} payed @{loginTo} {balance}{GetSelectedAsset().GetEmojiFor()}",
+            text: $"@{loginFrom} payed @{loginTo} {balance}{NovelUserAssets.CRYSTAL.GetEmojiFor()}",
             cancellationToken: ct);
 
-        await User.GrantCoinsAsync(GetSelectedAsset(), -balance);
-        await toUser.GrantCoinsAsync(GetSelectedAsset(), balance);
+        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -balance);
+        await toUser.GrantCoinsAsync(NovelUserAssets.CRYSTAL, balance);
     }
 }
 
-
-
-public class PayCrownCommand : PayCommand
-{
-    public override List<string> Aliases => new() { "/pay_crown" };
-    public override NovelUserAssets GetSelectedAsset() => NovelUserAssets.CROWN;
-}
-
-public class PayCrystalCommand : PayCommand
-{
-    public override List<string> Aliases => new() { "/pay_crystal" };
-    public override NovelUserAssets GetSelectedAsset() => NovelUserAssets.CRYSTAL;
-}

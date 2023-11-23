@@ -5,6 +5,7 @@ using RandomGen;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using File = System.IO.File;
 
 namespace nai.commands;
 
@@ -27,28 +28,31 @@ public class VariationsCommand : Command, IKeyboardProcessor
                 cancellationToken: ct);
             return;
         }
+        var settings = Config.GetNaiSettings();
+        var seedFormula = new SeedFormula(settings.SeedFormula);
 
-        if (!User.IsAllowExecute(450, NovelUserAssets.CRYSTAL))
+        var paramsList = new List<NovelAIinput>();
+        var totalPrice = 0L;
+
+        foreach (var _ in Enumerable.Range(0, Math.Min(8, settings.VariationSize)))
+        {
+            var seed = seedFormula.GetSeed();
+            var @params = NovelAIParams.Create(settings, seed);
+            totalPrice += Db.CalculatePrice(settings.Engine, @params);
+            paramsList.Add(new NovelAIinput(settings.Engine.key, @params));
+        }
+
+        if (!User.IsAllowExecute(totalPrice, NovelUserAssets.CRYSTAL))
         {
             await BotClient.SendTextMessageAsync(
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
-                text: $"Insufficient balance of 💎",
+                text: $"Insufficient balance of 💎 (need {totalPrice}💎)",
                 cancellationToken: ct);
             return;
         }
         Console.WriteLine($"Start variations {User.TgLogin}");
-
-        var random = Gen.Random.Numbers.Longs(0, (long)(Math.Pow(2, 32) - 1));
-        var query = Enumerable.Range(0, 10)
-            .Select(x => new NovelAIParams
-            {
-                seed = random()
-            })
-            .Select(x => new NovelAIinput(cmdText.Contains("nsfw") ? "nai-diffusion" : "safe-diffusion", x)
-            {
-                input = cmdText
-            });
+        
 
         var novelAI = new NovelAI();
         var disposable = new List<MemoryStream>();
@@ -56,35 +60,19 @@ public class VariationsCommand : Command, IKeyboardProcessor
 
         var swg = await BotClient.SendTextMessageAsync(CharId, "Wait...", replyToMessageId: Message.MessageId, cancellationToken: ct);
         var index = 0;
-        foreach (var aIinput in query)
+        foreach (var aIinput in paramsList)
         {
-            var result = await novelAI
-                .Request()
-                .AllowAnyHttpStatus()
-                .PostJsonAsync(aIinput, cancellationToken: ct);
+            var result = await novelAI.GenerateRequest(BotClient, CharId, Message, aIinput, ct);
+            
+            disposable.AddRange(result);
 
-            if (result.StatusCode is not (200 or 201))
+
+            foreach (var (stream, i) in result.Select((x, i) => (x, i)))
             {
-                var strerr = await result.GetStringAsync();
-                await BotClient.SendTextMessageAsync(
-                    chatId: CharId,
-                    replyToMessageId: Message.MessageId,
-                    text: $"Unhandled error\n{result.StatusCode}, {strerr}, seed: {aIinput.parameters.seed}",
-                    cancellationToken: ct);
-                return;
+                files.Add(new InputMediaDocument(InputFile.FromStream(stream, $"{aIinput.parameters.seed}-{i}.png")));
+                Console.WriteLine($"Generated {aIinput.parameters.seed}-{i}.png");
+
             }
-
-            var str = await result.GetStringAsync();
-            var entities = str.Split('\n');
-            var data = entities[2].Replace("data:", "");
-            var bytes = Convert.FromBase64String(data);
-
-            var stream = new MemoryStream(bytes);
-            disposable.Add(stream);
-
-            files.Add(new InputMediaDocument(InputFile.FromStream(stream, $"{aIinput.parameters.seed}.png")));
-
-            Console.WriteLine($"Generated {aIinput.parameters.seed}.png");
             await Task.Delay(3000, ct);
             index++;
 
@@ -97,10 +85,10 @@ public class VariationsCommand : Command, IKeyboardProcessor
             media: files.ToArray(), cancellationToken: ct);
         await BotClient.DeleteMessageAsync(CharId, swg.MessageId, ct);
         await BotClient.SendTextMessageAsync(chatId: CharId, text:
-            $"Variation generated\npaid 450 💎",
+            $"Variation generated\npaid {totalPrice} 💎",
             parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId, cancellationToken: ct);
 
-        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -450);
+        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -totalPrice);
 
         foreach (var stream in disposable) await stream.DisposeAsync();
 
@@ -109,77 +97,71 @@ public class VariationsCommand : Command, IKeyboardProcessor
 
     public async ValueTask ProcessAction(KeyboardImageGeneratorData context)
     {
-        var uints = Gen.Random.Numbers.Longs(0, (long)(Math.Pow(2, 32) - 1));
-        var seed = uints();
+        var settings = Config.GetNaiSettings();
+        var seedFormula = new SeedFormula(settings.SeedFormula);
+
 
         var novelAI = new NovelAI();
-        var pams = new NovelAIParams
-        {
-            seed = seed, //context.seed,
-            height = (int)(context.size.width),
-            width = (int)(context.size.height),
-            image = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(context.pngPath)),
-            strength = 0.8f,
-            noise = 0.1f,
-            n_samples = 3,
-            steps = 50
-        };
 
-        var promt = new NovelAIinput("safe-diffusion", pams) { input = context.config };
-        var result = await novelAI
-            .Request()
-            .AllowAnyHttpStatus()
-            .PostJsonAsync(promt);
+        var seed = seedFormula.GetSeed();
+        var @params = NovelAIParams.Create(settings, seed);
 
-        if (result.StatusCode is not (200 or 201))
-        {
-            var strerr = await result.GetStringAsync();
-            Console.WriteLine(strerr);
-            return;
-        }
+        @params.height = (int)(context.size.width);
+        @params.width = (int)(context.size.height);
+        @params.image = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(context.pngPath));
+        @params.strength = 0.8f;
+        @params.noise = 0.1f;
+        @params.n_samples = 3;
+        @params.steps = 50; // maybe need use step count from settings?
+        
 
-        var str = await result.GetStringAsync();
-        var entities = str.Split('\n')
-            .Where(x => x.StartsWith("data:"))
-            .Select(x => x.Replace("data:", ""))
-            .Select(Convert.FromBase64String);
+        var input = new NovelAIinput(settings.Engine.key, @params);
         var toDispose = new List<IDisposable>();
         var files = new List<InputMediaDocument>();
 
-        foreach (var (x, i) in entities.Select((x, i) => (x, i)))
+        input.input = context.config;
+
+        try
         {
-            var stream = new MemoryStream(x);
-            toDispose.Add(stream);
-            await System.IO.File.WriteAllBytesAsync($"{context.pngPath}.variant.{i}.png", x);
-            files.Add(new InputMediaDocument(InputFile.FromStream(stream, $"{context.seed}.variant.{i}.png")));
-        }
+            var entities = await novelAI.GenerateRequest(BotClient, CharId, Message, input);
 
-        if (Message.ReplyToMessage!.From!.Id != User.Id)
+            foreach (var (stream, i) in entities.Select((x, i) => (x, i)))
+            {
+                toDispose.Add(stream);
+                await File.WriteAllBytesAsync($"{context.pngPath}.variant.{i}.png", stream.ToArray());
+                files.Add(new InputMediaDocument(InputFile.FromStream(stream, $"{context.seed}.variant.{i}.png")));
+            }
+
+            if (Message.ReplyToMessage!.From!.Id != User.Id)
+            {
+                var msg = await BotClient.SendMediaGroupAsync(
+                    chatId: CharId,
+                    replyToMessageId: Message.MessageId,
+                    media: files.ToArray());
+
+                await BotClient.SendTextMessageAsync(chatId: CharId, text:
+                    $"Variations {context.seed} \n@{Message.ReplyToMessage!.From!.Username}!\n@{User.TgLogin} paid {context.price} 💎",
+                    parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId);
+            }
+            else
+            {
+
+                var msg = await BotClient.SendMediaGroupAsync(
+                    chatId: CharId,
+                    replyToMessageId: Message.MessageId,
+                    media: files.ToArray());
+
+                await BotClient.SendTextMessageAsync(chatId: CharId, text:
+                    $"Variations {context.seed} \nPaid {context.price} 💎",
+                    parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId);
+            }
+
+            await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -context.price);
+        }
+        finally
         {
-            var msg = await BotClient.SendMediaGroupAsync(
-                chatId: CharId,
-                replyToMessageId: Message.MessageId,
-                media: files.ToArray());
-
-            await BotClient.SendTextMessageAsync(chatId: CharId, text:
-                $"Variations {context.seed} \n@{Message.ReplyToMessage!.From!.Username}!\n@{User.TgLogin} paid {context.price.crystals} 💎, {context.price.crowns} 👑",
-                parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId);
+            toDispose.ForEach(x => x.Dispose());
         }
-        else
-        {
-
-            var msg = await BotClient.SendMediaGroupAsync(
-                chatId: CharId,
-                replyToMessageId: Message.MessageId,
-                media: files.ToArray());
-
-            await BotClient.SendTextMessageAsync(chatId: CharId, text:
-                $"Variations {context.seed} \nPaid {context.price.crystals} 💎, {context.price.crowns} 👑",
-                parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId);
-        }
-
-        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -context.price.crystals);
-        await User.GrantCoinsAsync(NovelUserAssets.CROWN, -context.price.crowns);
     }
 
     public KeyboardAction Action => KeyboardAction.Variations;

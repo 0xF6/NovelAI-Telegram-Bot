@@ -10,8 +10,7 @@ public class BalanceCommand : Command
             chatId: CharId,
             replyToMessageId: Message.MessageId,
             text: $"Your balance \n" +
-                  $"💎 {User.CrystalCoin}\n" +
-                  $"👑 {User.CrownCoin}",
+                  $"💎 {User.CrystalCoin}",
             cancellationToken: ct);
     }
 }

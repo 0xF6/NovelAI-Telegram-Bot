@@ -77,7 +77,7 @@ public class Db
 
     public static long CalculatePrice(NovelAIEngine engine, NovelAIParams @params)
     {
-        var formula = new Formula(Config.CrystallFormula);
+        var formula = new CrystallFormula(Config.CrystallFormula);
         return formula.GetPrice(engine, @params.steps, new Vector2(@params.width, @params.height));
     }
     

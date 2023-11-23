@@ -21,8 +21,6 @@ public class NovelUser
 
     public async ValueTask GrantCoinsAsync(NovelUserAssets asset, float coins)
     {
-        if (asset == NovelUserAssets.CROWN)
-            CrownCoin += coins;
         if (asset == NovelUserAssets.CRYSTAL)
             CrystalCoin += coins;
         await Db.SaveUser(this);
@@ -38,7 +36,6 @@ public class NovelUser
         asset switch
         {
             NovelUserAssets.CRYSTAL => IsAllowExecute(price),
-            NovelUserAssets.CROWN => IsAllowExecuteByCrown(price),
             _ => false
         };
 }

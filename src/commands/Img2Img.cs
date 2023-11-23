@@ -16,8 +16,6 @@ public class Img2ImgP : ImageGenCommand
     protected override (int x, int y) GetSize() => (512, 768);
 
     protected override int GetAdditionalPrice() => 7;
-    protected override int GetCrownPrice() => 11;
-
 
     protected override async ValueTask OnFillAdditionalData(NovelAIinput input)
     {

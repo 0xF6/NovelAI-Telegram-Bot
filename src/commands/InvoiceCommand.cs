@@ -21,10 +21,10 @@ public class InvoiceCommand : Command
             return;
         try
         {
-            await BotClient.SendInvoiceAsync(CharId, "Purchase of currency", $"Purchase {balance * 5} 👑 {balance * 100} 💎", $"{balance}", payToken, payCurrency,
+            await BotClient.SendInvoiceAsync(CharId, "Purchase of currency", $"Purchase {balance * 5} 💎", $"{balance}", payToken, payCurrency,
                 new LabeledPrice[]
                 {
-                    new LabeledPrice($"{balance * 5} 👑 {balance * 100} 💎", (int)(balance) * 100),
+                    new LabeledPrice($"{balance * 5} 💎", (int)(balance) * 5),
                 }, replyToMessageId: Message.MessageId, cancellationToken: ct);
         }
         catch (Exception e)

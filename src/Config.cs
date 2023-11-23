@@ -1,4 +1,6 @@
-﻿namespace nai;
+﻿using nai.nai;
+
+namespace nai;
 
 using Microsoft.Extensions.Configuration;
 using System.Runtime.CompilerServices;
@@ -57,6 +59,46 @@ public static class Config
     public static bool IsDbActive(Db.DbKind kind)
         => bool.Parse(Root.GetSection("Database").GetSection(kind.ToString()).GetSection("IsActive").Value!);
 
+
+    public static NaiSettings GetNaiSettings()
+    {
+        var settings = new NaiSettings();
+        Root.GetSection("nai").Bind(settings, x => x.ErrorOnUnknownConfiguration = true);
+        return settings;
+    }
+
     public static string GetDbPath(Db.DbKind kind)
         => Root.GetSection("Database").GetSection(kind.ToString()).GetSection("ConnectionString").Value!;
+}
+
+public class NaiSettings
+{
+    public string Username { get; set; }
+    public string Password { get; set; }
+    public string SelectedModel { get; set; }
+    public NegateTags DefaultNegateTags { get; set; }
+    public string SelectedSampler { get; set; }
+    public bool SMEA { get; set; }
+    public bool DYN { get; set; }
+    public int Guidance { get; set; }
+    public int ucPreset { get; set; }
+    public bool qualityToggle { get; set; }
+    public bool dynamic_thresholding { get; set; }
+    public int controlnet_strength { get; set; }
+    public int defaultStep { get; set; }
+    public string CrystallFormula { get; set; }
+    public string EnhanceFormula { get; set; }
+    public string VariationFormula { get; set; }
+    public string SeedFormula { get; set; }
+    public int VariationSize { get; set; }
+
+    public string SfwNegateTags { get; set; }
+
+    public NovelAIEngine Engine => NovelAIEngine.ByKey(SelectedModel);
+}
+
+public class NegateTags
+{
+    public string Actual { get; set; }
+    public string Legacy { get; set; }
 }
