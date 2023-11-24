@@ -1,0 +1,72 @@
+---
+TelegramBotToken:
+ModeOfChannel: false
+MainAdministrator:
+DefaultLocale: en-US
+Database:
+  Firestore:
+    IsActive: false
+    ConnectionString: ProjectId://nai
+    CredentialPath: 
+  LiteDB:
+    IsActive: true
+    ConnectionString: nai.db
+
+Invoince:
+    PaymentProviderToken: 
+    Currency: USD
+    ConvertRate: "1 -> 50"
+
+Commands:
+  PortraitNsfwImageGenCommand: true
+  PortraitSfwImageGenCommand: true
+  LandNsfwImageGenCommand: true
+  LandSfwImageGenCommand: true
+  BalanceCommand: true
+  GrantBalanceCommand: true
+  EnhanceCommand: true
+  VariationsCommand: true
+  Img2ImgP: true
+  PayCommand: true
+  InvoiceCommand: true
+  AuthCommand: true
+  StartCommand: true
+
+
+Nai:
+    Username:
+    Password:
+    #    model name       |           description            |   Anlas Price (default promt settings wihout subscribes)
+    # safe-diffusion      - NAI Diffusion Anime V1 (Curated) -  5
+    # nai-diffusion       - NAI Diffusion Anime V1 (Full)    -  5
+    # nai-diffusion-furry - NAI Diffusion Furry              -  5
+    # nai-diffusion-2     - NAI Diffusion Anime V2           - 13
+    # nai-diffusion-3     - NAI Diffusion Anime V3           - 30
+    DefaultNegateTags:
+        Actual: "lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
+        Legacy: "lowres, polar lowres, bad anatomy, bad face, bad hands, bad body, bad feet, bad proportions, {bad leg}, {{{more legs}}}, worst quality, low quality, normal quality, gross proportions, blurry, poorly drawn, text, error, missing fingers, missing arms, missing legs, short legs, extra digit, 2girls, long skirt, indoors, out of frame, only_upper body, only_lower body, petite, low background, distorted perspective"
+    SfwNegateTags: "nsfw, nude, naked"
+    SelectedModel: nai-diffusion-3
+    # k_euler_ancestral
+    # k_dpmpp_2m
+    # k_euler
+    # k_dpm_2
+    # k_dpmpp_2s_ancestral
+    # k_dpmpp_sde
+    # k_dpm_fast
+    # ddim
+    SelectedSampler: k_euler_ancestral
+    SMEA: false
+    DYN: false
+    Guidance: 11
+    ucPreset: 0
+    qualityToggle: true
+    dynamic_thresholding: false
+    controlnet_strength: 1
+    defaultStep: 28
+
+    CrystallFormula: "round((map([step], 1, 50, [minAnlas], [maxAnlas]) + map([quality], 4096, 3145728, 2, 136)) / 2)"
+    EnhanceFormula: "round(price + (price * 0.6))"
+    VariationFormula: "price * 3"
+    SeedFormula: "l(0, pow(2, 32) - 1)"
+    VariationSize: 4

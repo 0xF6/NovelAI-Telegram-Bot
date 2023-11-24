@@ -30,6 +30,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
+.vs/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -350,3 +351,5 @@ MigrationBackup/
 .ionide/
 
 Properties/launchSettings.json
+
+src/Properties/launchSettings.json
