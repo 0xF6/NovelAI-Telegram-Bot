@@ -15,14 +15,16 @@ public class Localization
         => string.Format(FetchContract(_code).Get(key), args);
 
 
-    private readonly Dictionary<string, LocaleContract> _locales = new();
+    private static readonly Dictionary<string, LocaleContract> _locales = new();
 
     public void Load()
     {
+        if (_locales.Any())
+            return;
+
         var dir = new DirectoryInfo("./locales");
 
         var deserializer = new DeserializerBuilder()
-            //.WithNamingConvention(UnderscoredNamingConvention.Instance)  // see height_in_inches in sample yml 
             .Build();
 
         foreach (var file in dir.EnumerateFiles("*.yaml"))

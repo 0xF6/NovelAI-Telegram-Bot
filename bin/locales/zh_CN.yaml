@@ -10,3 +10,10 @@ AuthSuccess: |
     聊天已被授权!
 AuthFailed: |
     О授权聊天失败，密码错误。    
+YourBalance: |
+    Your balance
+    💎 {0}
+CoinsGranted: |
+    For user @{0} gived {1}💎!
+InsufficientBalance: |
+    Insufficient balance of 💎    

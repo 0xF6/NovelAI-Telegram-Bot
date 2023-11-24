@@ -1,4 +1,5 @@
-﻿using nai.db;
+﻿using nai;
+using nai.db;
 using nai.i18n;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -17,7 +18,8 @@ public abstract class Command : ISetterContext
         this.Message = msg;
         this.User = user;
         this.BotClient = botClient;
-        this.Locale = new Localization(msg.From?.LanguageCode ?? "en");
+        this.Locale = new Localization(Config.DefaultLocale);
+        this.Locale.Load();
     }
 
     public virtual string QueueName => "none";

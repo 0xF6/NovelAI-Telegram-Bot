@@ -1,4 +1,5 @@
 ﻿using nai.db;
+using nai.i18n;
 using Telegram.Bot;
 
 namespace nai.commands;
@@ -24,7 +25,7 @@ public class PayCommand : Command
             await BotClient.SendTextMessageAsync(
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
-                text: $"Insufficient balance of  {NovelUserAssets.CRYSTAL.GetEmojiFor()}",
+                text: Locale.Get(Locales.InsufficientBalance),
                 cancellationToken: ct);
             return;
         }

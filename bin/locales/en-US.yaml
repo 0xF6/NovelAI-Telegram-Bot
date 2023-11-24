@@ -10,3 +10,10 @@ AuthSuccess: |
     Chat has been authorized!
 AuthFailed: |
     Failed authorization chat, bad passcode.
+YourBalance: |
+    Your balance
+    💎 {0}
+CoinsGranted: |
+    For user @{0} gived {1}💎!
+InsufficientBalance: |
+    Insufficient balance of 💎    

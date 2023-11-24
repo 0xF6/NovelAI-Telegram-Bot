@@ -2,7 +2,7 @@
 TelegramBotToken:
 ModeOfChannel: false
 MainAdministrator:
-
+DefaultLocale: en-US
 Database:
   Firestore:
     IsActive: false
@@ -11,6 +11,11 @@ Database:
   LiteDB:
     IsActive: true
     ConnectionString: nai.db
+
+Invoince:
+    PaymentProviderToken: 
+    Currency: USD
+    ConvertRate: "1 -> 50"
 
 Commands:
   PortraitNsfwImageGenCommand: true
@@ -39,9 +44,9 @@ Nai:
     # nai-diffusion-3     - NAI Diffusion Anime V3           - 30
     DefaultNegateTags:
         Actual: "lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract]"
-        Legacy: "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
+        Legacy: "lowres, polar lowres, bad anatomy, bad face, bad hands, bad body, bad feet, bad proportions, {bad leg}, {{{more legs}}}, worst quality, low quality, normal quality, gross proportions, blurry, poorly drawn, text, error, missing fingers, missing arms, missing legs, short legs, extra digit, 2girls, long skirt, indoors, out of frame, only_upper body, only_lower body, petite, low background, distorted perspective"
     SfwNegateTags: "nsfw, nude, naked"
-    SelectedModel: nai-diffusion
+    SelectedModel: nai-diffusion-3
     # k_euler_ancestral
     # k_dpmpp_2m
     # k_euler

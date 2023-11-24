@@ -6,6 +6,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using File = System.IO.File;
+using nai.i18n;
 
 namespace nai.commands;
 
@@ -47,7 +48,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
             await BotClient.SendTextMessageAsync(
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
-                text: $"Insufficient balance of 💎 (need {totalPrice}💎)",
+                text: Locale.Get(Locales.InsufficientBalance),
                 cancellationToken: ct);
             return;
         }

@@ -10,3 +10,10 @@ AuthSuccess: |
     Чат авторизован!
 AuthFailed: |
     Ошибка авторизации, неверный пасс.    
+YourBalance: |
+    Ваш баланс
+    💎 {0}
+CoinsGranted: |
+    Юзеру @{0} выдано {1}💎!
+InsufficientBalance: |
+    Недостаточно 💎    

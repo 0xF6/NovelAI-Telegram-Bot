@@ -1,7 +1,7 @@
-﻿using Telegram.Bot.Types.Payments;
-using Telegram.Bot;
+﻿namespace nai.commands;
 
-namespace nai.commands;
+using Telegram.Bot.Types.Payments;
+using Telegram.Bot;
 
 public class InvoiceCommand : Command
 {
@@ -13,18 +13,35 @@ public class InvoiceCommand : Command
 
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
     {
-        var payToken = Environment.GetEnvironmentVariable("TELEGRAM_PAYMENT_PROVIDER_TOKEN");
-        var payCurrency = Environment.GetEnvironmentVariable("TELEGRAM_PAYMENT_CURRENCY") ?? "USD";
+        var cfg = Config.GetInvoiceConfig();
 
 
-        if (!ushort.TryParse(cmdText, out var balance))
+        var payToken = cfg.PaymentProviderToken;
+        var payCurrency = cfg.Currency;
+        var convertRate = cfg.ConvertRate;
+
+        if (string.IsNullOrEmpty(payToken))
             return;
+        if (string.IsNullOrEmpty(payCurrency))
+            return;
+        if (string.IsNullOrEmpty(convertRate))
+            return;
+
+        var from = decimal.Parse(convertRate.Split("->").First().Trim());
+        var to = decimal.Parse(convertRate.Split("->").Last().Trim());
+
+
+        if (!ushort.TryParse(cmdText, out var input))
+            return;
+
+        var crystals = (input * from) * to;
+
         try
         {
-            await BotClient.SendInvoiceAsync(CharId, "Purchase of currency", $"Purchase {balance * 5} 💎", $"{balance}", payToken, payCurrency,
+            await BotClient.SendInvoiceAsync(CharId, "Purchase of currency", $"Purchase {crystals} 💎", $"{crystals}", payToken, payCurrency,
                 new LabeledPrice[]
                 {
-                    new LabeledPrice($"{balance * 5} 💎", (int)(balance) * 5),
+                    new LabeledPrice($"{crystals} 💎", input),
                 }, replyToMessageId: Message.MessageId, cancellationToken: ct);
         }
         catch (Exception e)
@@ -37,4 +54,11 @@ public class InvoiceCommand : Command
                 cancellationToken: ct);
         }
     }
+}
+
+public class InvoiceConfig
+{
+    public string PaymentProviderToken { get; set; }
+    public string Currency { get; set; }
+    public string ConvertRate { get; set; }
 }

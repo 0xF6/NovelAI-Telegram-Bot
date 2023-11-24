@@ -1,4 +1,5 @@
-﻿using nai.nai;
+﻿using nai.commands;
+using nai.nai;
 
 namespace nai;
 
@@ -43,15 +44,13 @@ public static class Config
 
     public static bool ModeOfChannel => bool.Parse(GetValue());
 
-    public static string NovelAI_Username => GetValue();
     public static long MainAdministrator => long.Parse(GetValue());
 
     public static string NovelAIToken => GetValue();
 
-    public static string PythonDllPath => GetValue();
     public static string CrystallFormula => Root.GetSection("Nai").GetSection("CrystallFormula").Value;
     public static string NovelAiEngine => Root.GetSection("Nai").GetSection("SelectedModel").Value;
-
+    public static string DefaultLocale => GetValue();
 
     public static bool CommandIsActive(Command command) 
         => bool.Parse(Root.GetSection("Commands").GetSection(command.GetType().Name).Value!);
@@ -65,6 +64,13 @@ public static class Config
         var settings = new NaiSettings();
         Root.GetSection("nai").Bind(settings, x => x.ErrorOnUnknownConfiguration = true);
         return settings;
+    }
+
+    public static InvoiceConfig GetInvoiceConfig()
+    {
+        var config = new InvoiceConfig();
+        Root.GetSection("invoice").Bind(config, x => x.ErrorOnUnknownConfiguration = true);
+        return config;
     }
 
     public static string GetDbPath(Db.DbKind kind)

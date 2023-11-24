@@ -2,6 +2,7 @@
 using Ionic.Zip;
 using nai;
 using nai.db;
+using nai.i18n;
 using nai.nai;
 using RandomGen;
 using Telegram.Bot;
@@ -57,7 +58,7 @@ public abstract class ImageGenCommand : Command
             await BotClient.SendTextMessageAsync(
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,
-                text: $"Insufficient balance of 💎",
+                text: Locale.Get(Locales.InsufficientBalance),
                 cancellationToken: ct);
             return;
         }
@@ -105,7 +106,7 @@ public abstract class ImageGenCommand : Command
             chatId: CharId,
             replyToMessageId: Message.MessageId,
             document: inpf,
-            caption: $"{seed}, paid {price} 💎",
+            caption: $"{GetEngineName()} {seed}, paid {price} 💎",
             parseMode: ParseMode.Html,
             replyMarkup: inlineKeyboard,
             cancellationToken: ct);

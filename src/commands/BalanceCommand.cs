@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using nai.i18n;
+using Telegram.Bot;
 
 public class BalanceCommand : Command
 {
@@ -9,8 +10,7 @@ public class BalanceCommand : Command
         await BotClient.SendTextMessageAsync(
             chatId: CharId,
             replyToMessageId: Message.MessageId,
-            text: $"Your balance \n" +
-                  $"💎 {User.CrystalCoin}",
+            text: string.Format(Locale.Get(Locales.YourBalance), User.CrystalCoin),
             cancellationToken: ct);
     }
 }
