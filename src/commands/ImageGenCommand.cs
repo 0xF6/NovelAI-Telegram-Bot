@@ -1,4 +1,5 @@
-﻿using Flurl.Http;
+﻿using System.Text.RegularExpressions;
+using Flurl.Http;
 using Ionic.Zip;
 using nai;
 using nai.db;
@@ -45,11 +46,39 @@ public abstract class ImageGenCommand : Command
         var seedFormula = new SeedFormula(settings.SeedFormula);
         var seed = seedFormula.GetSeed();
 
+
+        if (Regex.IsMatch(cmdText, @"\@seed\:(\d+)"))
+        {
+            var seeds = Regex.Match(cmdText, @"\@seed\:(\d+)");
+
+            cmdText = Regex.Replace(cmdText, @"\@seed\:(\d+)", "");
+            var s = seeds.Groups[1].Value;
+
+            seed = long.Parse(s);
+        }
+
+
+        
+
+
         var pams = NovelAIParams.Create(settings, seed);
         if (!IsSfw()) pams.negative_prompt += $", {settings.SfwNegateTags}";
 
         pams.width = GetSize().x;
         pams.height = GetSize().y;
+
+
+        if (cmdText.Contains("@dyn"))
+        {
+            cmdText = cmdText.Replace("@dyn", "");
+            pams.sm_dyn = true;
+        }
+
+        if (cmdText.Contains("@smea"))
+        {
+            cmdText = cmdText.Replace("@dyn", "");
+            pams.sm = true;
+        }
 
         var price = Db.CalculatePrice(NovelAIEngine.ByKey(GetEngineName()), pams) + GetAdditionalPrice();
 
@@ -70,7 +99,7 @@ public abstract class ImageGenCommand : Command
 
         var promt = new NovelAIinput(GetEngineName(), pams)
         {
-            input = cmdText
+            input = cmdText + ", best quality, amazing quality, very aesthetic, absurdres"
         };
 
         await OnFillAdditionalData(promt);

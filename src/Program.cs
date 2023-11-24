@@ -1,5 +1,6 @@
 ﻿using nai;
 using nai.commands;
+using nai.commands.images;
 using nai.db;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -69,7 +70,8 @@ var commands = new List<Command>()
     new PayCommand(),
     new AuthCommand(),
     new InvoiceCommand(),
-    new StartCommand()
+    new StartCommand(),
+    new WallPaperGenCommand()
 };
 
 // start receiving events

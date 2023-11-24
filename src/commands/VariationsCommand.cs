@@ -40,7 +40,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
             var seed = seedFormula.GetSeed();
             var @params = NovelAIParams.Create(settings, seed);
             totalPrice += Db.CalculatePrice(settings.Engine, @params);
-            paramsList.Add(new NovelAIinput(settings.Engine.key, @params));
+            paramsList.Add(new NovelAIinput(settings.Engine.key, @params) {  input = cmdText });
         }
 
         if (!User.IsAllowExecute(totalPrice, NovelUserAssets.CRYSTAL))
