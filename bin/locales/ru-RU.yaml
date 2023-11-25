@@ -17,3 +17,11 @@ CoinsGranted: |
     Юзеру @{0} выдано {1}💎!
 InsufficientBalance: |
     Недостаточно 💎    
+EngineHasSwitched: |
+    Engine has been switched to {0}
+ActiveEngine: >
+    Your active engine is '{0}'
+    Available engines:
+    {1}
+EngineNotFound: |
+    Engine '{0}' not registered    
