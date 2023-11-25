@@ -9,4 +9,7 @@ public static class Locales
     public const string YourBalance = nameof(LocaleContract.YourBalance);
     public const string CoinsGranted = nameof(LocaleContract.CoinsGranted);
     public const string InsufficientBalance = nameof(LocaleContract.InsufficientBalance);
+    public const string EngineHasSwitched = nameof(LocaleContract.EngineHasSwitched);
+    public const string ActiveEngine = nameof(LocaleContract.ActiveEngine);
+    public const string EngineNotFound = nameof(LocaleContract.EngineNotFound);
 }

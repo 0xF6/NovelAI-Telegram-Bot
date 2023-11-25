@@ -9,4 +9,7 @@ public class LocaleContract : ILocaleContract
     public string YourBalance { get; set; }
     public string CoinsGranted { get; set; }
     public string InsufficientBalance { get; set; }
+    public string EngineHasSwitched { get; set; }
+    public string ActiveEngine { get; set; }
+    public string EngineNotFound { get; set; }
 }
