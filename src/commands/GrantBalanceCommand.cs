@@ -12,8 +12,7 @@ public class GrantBalanceCommand : Command
         if (!float.TryParse(cmdText, out var balance))
             return;
 
-        if (!User.IsAdmin || Config.MainAdministrator != User.Id)
-            return;
+        if (!User.IsAdmin && Config.MainAdministrator != User.Id) return;
 
         var tgUser = Message.ReplyToMessage!.From;
         var toUser = await Db.GetUser(tgUser!);
