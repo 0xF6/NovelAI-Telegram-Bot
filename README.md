@@ -22,37 +22,43 @@
 
 ## Setup 
 
-Install `.NET 8.0`       
-Set `TelegramBotToken`, `Nai:AuthToken` (see about authorization), `MainAdministrator` in bin/config.yaml
-Execute `bin/run.ps1` or `bin/run.sh` 
-Complete! ✨✨✨
+Install `.NET 8.0`         
+Set `TelegramBotToken`, `Nai:AuthToken` (see about authorization), `MainAdministrator` in bin/config.yaml      
+Execute `bin/run.ps1` or `bin/run.sh`     
+Complete! ✨✨✨    
 
     
 About 💎, its direct of Anlas in your novel ai account (btw, crystal formula calculation does not have 100% accuracy), according to this, distribute between users more carefully    
     
 
-For using payment order set up `Currency` (USD, EUR and etc) and `PaymentProviderToken` (getting in bot father in payment menu)   
+For using payment order set up `Currency` (USD, EUR and etc) and `PaymentProviderToken` (getting in bot father in payment menu)     
 
 ## Commands
 
 `/balance`    
-- View the balance of your 💎    
+- View the balance of your 💎
+
 `/engine`      
-- View currrent active engine (per user only)      
+- View currrent active engine (per user only)
+
 `/engine nai-diffusion-2`    
-- Set active engine as nai-diffusion-2 (per user only)      
+- Set active engine as nai-diffusion-2 (per user only)
+   
 `/p 1girl, beer`   
 - Generation of portrait sfw pictures    
 - You can also specify @DYN or @SMEA     
  (SMEA version of samplers are modified to perform better at high resolution)    
- (DYN variants of SMEA samplers often lead to more varied output, but may fail at very high resolution)    
+ (DYN variants of SMEA samplers often lead to more varied output, but may fail at very high resolution)
+
 `/l 1girl, beer`         
 - The same thing, only landscape orientation      
  
 `/variations 1girl`       
-- It will generate 10 variations of your promt     
+- It will generate 10 variations of your promt
+
 `/enhance`    
-- Reply to result, generate a variation with low noise, produce an upscale of 1.5 times     
+- Reply to result, generate a variation with low noise, produce an upscale of 1.5 times
+
 `/wallpaper 1girl`    
 - Generation of portrait wallpaper of high resolution (auto enabled SMEA toggle)    
 
