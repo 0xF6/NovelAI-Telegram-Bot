@@ -1,8 +1,11 @@
 ﻿using Flurl.Http;
 using Ionic.Zip;
 using nai.db;
+using System.IO;
+using Newtonsoft.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace nai.nai;
 
@@ -18,8 +21,22 @@ public record NovelAIEngine(string key, long minPrice, long maxPrice, bool isAct
     public static List<NovelAIEngine> All = new List<NovelAIEngine>()
         { SafeDiffusion, NaiDiffusion, NaiFurry, NaiV2, NaiV3 };
 
-    public static NovelAIEngine ByKey(string key) =>
-        All.First(x => x.key.Equals(key, StringComparison.InvariantCultureIgnoreCase));
+    public static NovelAIEngine ByKey(string key)
+    {
+        key = key.Trim();
+        try
+        {
+            return All.First(x => x.key.Equals(key, StringComparison.InvariantCultureIgnoreCase));
+        }
+        catch
+        {
+            Console.WriteLine($"Error when finding '{key}' in All");
+            throw;
+        }
+    }
+
+    public static bool HasKey(string key) =>
+        All.Any(x => x.key.Equals(key.Trim(), StringComparison.InvariantCultureIgnoreCase));
 }
 
 
@@ -29,10 +46,11 @@ public class NovelAI
 
     public NovelAI()
     {
-        flurl = new FlurlClient("https://api.novelai.net/ai/generate-image");
+        var settings = Config.GetNaiSettings();
+        flurl = new FlurlClient(settings.GenerationUrl);
 
         flurl.WithHeader("Authorization",
-            $"Bearer {Config.NovelAIToken}");
+            $"Bearer {settings.AuthToken}");
     }
 
 
@@ -58,6 +76,17 @@ public class NovelAI
             return new List<MemoryStream>();
         }
 
+        if (Config.DebugRequests)
+        {
+            await botClient.SendTextMessageAsync(
+                chatId: chatId,
+                replyToMessageId: message.MessageId,
+                text: $"[Request]\nStatusCode: {result.StatusCode}, seed: {input.parameters.seed}, action: {input.action}, from <a href=\"tg://user?id={message.From!.Id}\">{message.From.FirstName}</a>\n" +
+                      $"<pre><code class=\"json\">" +
+                      $"{JsonConvert.SerializeObject(input.parameters, Formatting.Indented)}\n" +
+                      $"</code></pre>",
+                cancellationToken: ct, parseMode: ParseMode.Html);
+        }
 
         using var zip = ZipFile.Read(await result.GetStreamAsync());
 

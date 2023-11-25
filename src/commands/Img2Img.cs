@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using RandomGen;
 using Telegram.Bot;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace nai.commands;
 
@@ -10,12 +11,8 @@ public class Img2ImgP : ImageGenCommand
     {
         "/img2imgp"
     };
-
-    protected override bool IsSfw() => true;
-
+    
     protected override (int x, int y) GetSize() => (512, 768);
-
-    protected override int GetAdditionalPrice() => 7;
 
     protected override async ValueTask OnFillAdditionalData(NovelAIinput input)
     {
@@ -25,25 +22,25 @@ public class Img2ImgP : ImageGenCommand
             filePath: file.FilePath!,
             destination: mem);
 
-        var powerRegex = new Regex("power:(((\\d+\\.?\\d*)|(\\.\\d+)))");
+        var powerRegex = new Regex("@power:(((\\d+\\.?\\d*)|(\\.\\d+)))");
 
         if (powerRegex.IsMatch(input.input.Replace('\n', ' ')))
         {
             var power = powerRegex.Match(input.input.Replace('\n', ' '));
             input.parameters.strength = float.Parse(power.Groups[1].Value) - 0.01f;
-            input.input = input.input.Replace(power.Groups[0].Value, "");
+            input = input with { input = input.input.Replace(power.Groups[0].Value, "") };
             Console.WriteLine($"Success parsed power from input, power: {input.parameters.strength}");
         }
         else
             input.parameters.strength = 0.53f;
 
-        var noiseRegex = new Regex("noise:(((\\d+\\.?\\d*)|(\\.\\d+)))");
+        var noiseRegex = new Regex("@noise:(((\\d+\\.?\\d*)|(\\.\\d+)))");
 
         if (noiseRegex.IsMatch(input.input.Replace('\n', ' ')))
         {
             var noise = noiseRegex.Match(input.input.Replace('\n', ' '));
             input.parameters.noise = float.Parse(noise.Groups[1].Value) - 0.01f;
-            input.input = input.input.Replace(noise.Groups[0].Value, "");
+            input = input with { input = input.input.Replace(noise.Groups[0].Value, "") };
             Console.WriteLine($"Success parsed noise from input, noise: {input.parameters.noise}");
         }
         else

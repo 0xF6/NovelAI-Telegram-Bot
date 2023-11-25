@@ -1,6 +1,8 @@
-﻿public record NovelAIinput(string model, NovelAIParams parameters)
+﻿using nai.nai;
+
+public record NovelAIinput(string model, NovelAIParams parameters, string input)
 {
-    public string input { get; set; }
+    public NovelAIinput(NovelAIEngine engine, NovelAIParams parameters, string input) : this(engine.key, parameters, input) { }
     public string action { get; set; } = "generate";
 }
 

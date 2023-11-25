@@ -1,4 +1,4 @@
-using nai;
+﻿using nai;
 using nai.commands;
 using nai.commands.images;
 using nai.db;
@@ -10,7 +10,6 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.Payments;
-
 
 
 Config.Init();
@@ -58,10 +57,8 @@ if (Environment.GetEnvironmentVariable("TELEGRAM_BOT_MODE_OF_CHANNEL") is not nu
 // command list
 var commands = new List<Command>()
 {
-    new PortraitNsfwImageGenCommand(),
-    new PortraitSfwImageGenCommand(),
-    new LandNsfwImageGenCommand(),
-    new LandSfwImageGenCommand(),
+    new PortraitImageGenCommand(),
+    new LandImageGenCommand(),
     new BalanceCommand(), 
     new GrantBalanceCommand(),
     new EnhanceCommand(),
@@ -71,7 +68,8 @@ var commands = new List<Command>()
     new AuthCommand(),
     new InvoiceCommand(),
     new StartCommand(),
-    new WallPaperGenCommand()
+    new WallPaperGenCommand(),
+    new EngineCommand()
 };
 
 // start receiving events
@@ -98,6 +96,7 @@ async Task SafeHandle(ITelegramBotClient bot, Update update, CancellationToken c
     {
         Console.WriteLine(e.Message);
         Console.WriteLine($"Chat: @{update.Message?.Text} from @{update.Message?.Chat?.Username} ({update.Message?.Chat?.Id})");
+        Console.WriteLine(e.ToString());
     }
 }
 

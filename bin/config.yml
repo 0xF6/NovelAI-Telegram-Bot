@@ -3,6 +3,7 @@ TelegramBotToken:
 ModeOfChannel: false
 MainAdministrator:
 DefaultLocale: en-US
+DebugRequests: false
 Database:
   Firestore:
     IsActive: false
@@ -18,10 +19,9 @@ Invoince:
     ConvertRate: "1 -> 50"
 
 Commands:
-  PortraitNsfwImageGenCommand: true
-  PortraitSfwImageGenCommand: true
-  LandNsfwImageGenCommand: true
-  LandSfwImageGenCommand: true
+  PortraitImageGenCommand: true
+  LandImageGenCommand: true
+  WallPaperGenCommand: true
   BalanceCommand: true
   GrantBalanceCommand: true
   EnhanceCommand: true
@@ -31,44 +31,98 @@ Commands:
   InvoiceCommand: true
   AuthCommand: true
   StartCommand: true
-  WallPaperGenCommand: true
+  EngineCommand: true
 
 
 Nai:
-    Username:
-    Password:
+    AuthToken:
+    GenerationUrl: https://api.novelai.net/ai/generate-image
+    CrystallFormula: "round((map([step], 1, 50, [minAnlas], [maxAnlas]) + map([quality], 4096, 3145728, 2, 136)) / 2)"
+    EnhanceFormula: "round(price + (price * 0.6))"
+    VariationFormula: "price * 3"
+    SeedFormula: "l(0, pow(2, 32) - 1)"
+    VariationSize: 4
+    DefaultModel: nai-diffusion
     #    model name       |           description            |   Anlas Price (default promt settings wihout subscribes)
     # safe-diffusion      - NAI Diffusion Anime V1 (Curated) -  5
     # nai-diffusion       - NAI Diffusion Anime V1 (Full)    -  5
     # nai-diffusion-furry - NAI Diffusion Furry              -  5
     # nai-diffusion-2     - NAI Diffusion Anime V2           - 13
     # nai-diffusion-3     - NAI Diffusion Anime V3           - 30
-    DefaultNegateTags:
-        Actual: "lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract], lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
-        Legacy: "lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract], lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry" 
-    SfwNegateTags: "nsfw, nude, naked"
-    SelectedModel: nai-diffusion-3
-    # k_euler
-    # k_euler_ancestral
-    # k_dpmpp_2m
-    # k_euler
-    # k_dpm_2
-    # k_dpmpp_2s_ancestral
-    # k_dpmpp_sde
-    # k_dpm_fast
-    # ddim
-    SelectedSampler: k_euler
-    SMEA: false
-    DYN: true
-    Guidance: 5
-    ucPreset: 0
-    qualityToggle: true
-    dynamic_thresholding: false
-    controlnet_strength: 1
-    defaultStep: 28
+    PerModel:
+        default:
+            inherit:
+            width: 0
+            height: 0
+            guidance: 10
+            # k_euler
+            # k_euler_ancestral
+            # k_dpmpp_2m
+            # k_euler
+            # k_dpm_2
+            # k_dpmpp_2s_ancestral
+            # k_dpmpp_sde
+            # k_dpm_fast
+            # ddim
+            sampler: k_euler_ancestral
+            defaultStep: 28
+            seed: -1
+            n_samples: 1
+            ucPreset: 0
+            qualityToggle: true
+            SMEA: false
+            DYN: false
+            dynamic_thresholding: false
+            controlnet_strength: 1
+            legacy: false
+            add_original_image: false
+            negative_prompt: 
+            uncond_scale: 
+            cfg_rescale: 
+            noise_schedule: 
 
-    CrystallFormula: "round((map([step], 1, 50, [minAnlas], [maxAnlas]) + map([quality], 4096, 3145728, 2, 136)) / 2)"
-    EnhanceFormula: "round(price + (price * 0.6))"
-    VariationFormula: "price * 3"
-    SeedFormula: "l(0, pow(2, 32) - 1)"
-    VariationSize: 4
+
+        nai-diffusion-3:
+            inherit: default
+            guidance: 5
+            dynamic_thresholding: false
+            controlnet_strength: 1
+            defaultStep: 28
+            negative_prompt: "lowres, {bad}, error, fewer, extra, missing, worst quality, jpeg artifacts, bad quality, watermark, unfinished, displeasing, chromatic aberration, signature, extra digits, artistic error, username, scan, [abstract], lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry"
+            sampler: k_euler
+            uncond_scale: 1
+            cfg_rescale: 1
+            SMEA: false
+            DYN: false
+            qualityToggle: true
+            ucPreset: 2
+            noise_schedule: native
+        safe-diffusion:
+            inherit: nai-diffusion
+        nai-diffusion-furry:
+            inherit: nai-diffusion
+
+        nai-diffusion-2:
+            inherit: default
+            guidance: 10
+            sampler: k_euler_ancestral
+            negative_prompt: "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, bad feet, futa, futanari, yaoi,huge_breasts, large_breasts"
+            uncond_scale: 0.00001
+            SMEA: false
+            DYN: false
+            defaultStep: 28
+            ucPreset: 2
+            qualityToggle: true
+            controlnet_strength: 1
+            noise_schedule: native
+        nai-diffusion:
+            inherit: default
+            SMEA: false
+            guidance: 11
+            sampler: k_euler_ancestral
+            negative_prompt: "lowres, text, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry, bad feet, futa, futanari, yaoi,huge_breasts, large_breasts"
+            uncond_scale: null
+            ucPreset: 1
+            qualityToggle: false
+            controlnet_strength: 1
+            defaultStep: 28

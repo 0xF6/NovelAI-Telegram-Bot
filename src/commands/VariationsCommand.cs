@@ -29,7 +29,9 @@ public class VariationsCommand : Command, IKeyboardProcessor
                 cancellationToken: ct);
             return;
         }
+
         var settings = Config.GetNaiSettings();
+        var engine = User.GetSelectedEngine(settings);
         var seedFormula = new SeedFormula(settings.SeedFormula);
 
         var paramsList = new List<NovelAIinput>();
@@ -38,9 +40,9 @@ public class VariationsCommand : Command, IKeyboardProcessor
         foreach (var _ in Enumerable.Range(0, Math.Min(8, settings.VariationSize)))
         {
             var seed = seedFormula.GetSeed();
-            var @params = NovelAIParams.Create(settings, seed);
-            totalPrice += Db.CalculatePrice(settings.Engine, @params);
-            paramsList.Add(new NovelAIinput(settings.Engine.key, @params) {  input = cmdText });
+            var @params = NovelAIParams.Create(settings, engine, seed);
+            totalPrice += Db.CalculatePrice(engine, @params);
+            paramsList.Add(new NovelAIinput(engine, @params, cmdText));
         }
 
         if (!User.IsAllowExecute(totalPrice, NovelUserAssets.CRYSTAL))
@@ -99,13 +101,14 @@ public class VariationsCommand : Command, IKeyboardProcessor
     public async ValueTask ProcessAction(KeyboardImageGeneratorData context)
     {
         var settings = Config.GetNaiSettings();
+        var engine = User.GetSelectedEngine(settings);
         var seedFormula = new SeedFormula(settings.SeedFormula);
 
 
         var novelAI = new NovelAI();
 
         var seed = seedFormula.GetSeed();
-        var @params = NovelAIParams.Create(settings, seed);
+        var @params = NovelAIParams.Create(settings, engine, seed);
 
         @params.height = (int)(context.size.width);
         @params.width = (int)(context.size.height);
@@ -116,11 +119,9 @@ public class VariationsCommand : Command, IKeyboardProcessor
         @params.steps = 50; // maybe need use step count from settings?
         
 
-        var input = new NovelAIinput(settings.Engine.key, @params);
+        var input = new NovelAIinput(engine, @params, context.config);
         var toDispose = new List<IDisposable>();
         var files = new List<InputMediaDocument>();
-
-        input.input = context.config;
 
         try
         {

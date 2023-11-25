@@ -1,11 +1,8 @@
 ﻿using System.Text.RegularExpressions;
-using Flurl.Http;
-using Ionic.Zip;
 using nai;
 using nai.db;
 using nai.i18n;
 using nai.nai;
-using RandomGen;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -17,14 +14,8 @@ public abstract class ImageGenCommand : Command
 {
     public override string QueueName => "image_generation";
 
-    protected abstract bool IsSfw();
     protected abstract (int x, int y) GetSize();
-
-
-    protected virtual int GetAdditionalPrice() => 0;
-    protected string GetEngineName() => Config.NovelAiEngine; 
-
-
+    
     protected virtual ValueTask OnFillAdditionalData(NovelAIinput input) 
         => ValueTask.CompletedTask;
 
@@ -43,6 +34,7 @@ public abstract class ImageGenCommand : Command
         }
 
         var settings = Config.GetNaiSettings();
+        var engine = User.GetSelectedEngine(settings);
         var seedFormula = new SeedFormula(settings.SeedFormula);
         var seed = seedFormula.GetSeed();
 
@@ -58,11 +50,7 @@ public abstract class ImageGenCommand : Command
         }
 
 
-        
-
-
-        var pams = NovelAIParams.Create(settings, seed);
-        if (!IsSfw()) pams.negative_prompt += $", {settings.SfwNegateTags}";
+        var pams = NovelAIParams.Create(settings, engine, seed);
 
         pams.width = GetSize().x;
         pams.height = GetSize().y;
@@ -80,7 +68,7 @@ public abstract class ImageGenCommand : Command
             pams.sm = true;
         }
 
-        var price = Db.CalculatePrice(NovelAIEngine.ByKey(GetEngineName()), pams) + GetAdditionalPrice();
+        var price = Db.CalculatePrice(engine, pams);
 
         if (!User.IsAllowExecute(price))
         {
@@ -97,10 +85,9 @@ public abstract class ImageGenCommand : Command
 
         var novelAI = new NovelAI();
 
-        var promt = new NovelAIinput(GetEngineName(), pams)
-        {
-            input = cmdText + ", best quality, amazing quality, very aesthetic, absurdres"
-        };
+        if (engine.isActual) cmdText = $"{cmdText}, best quality, amazing quality, very aesthetic, absurdres";
+
+        var promt = new NovelAIinput(engine, pams, cmdText);
 
         await OnFillAdditionalData(promt);
 
@@ -135,7 +122,7 @@ public abstract class ImageGenCommand : Command
             chatId: CharId,
             replyToMessageId: Message.MessageId,
             document: inpf,
-            caption: $"{GetEngineName()} {seed}, paid {price} 💎",
+            caption: $"{engine.key} {seed}, paid {price} 💎",
             parseMode: ParseMode.Html,
             replyMarkup: inlineKeyboard,
             cancellationToken: ct);

@@ -26,10 +26,10 @@ public class EnhanceCommand : Command, IKeyboardProcessor
     public async ValueTask ProcessAction(KeyboardImageGeneratorData context)
     {
         var settings = Config.GetNaiSettings();
-
+        var engine = User.GetSelectedEngine(settings);
         var novelAI = new NovelAI();
 
-        var @params = NovelAIParams.Create(settings, context.seed);
+        var @params = NovelAIParams.Create(settings, engine, context.seed);
 
         @params.height = (int)(context.size.width * 1.5);
         @params.width = (int)(context.size.height * 1.5);
@@ -37,11 +37,7 @@ public class EnhanceCommand : Command, IKeyboardProcessor
         @params.strength = 0.7f;
         @params.noise = 0.2f;
 
-        var input = new NovelAIinput(settings.SelectedModel, @params)
-        {
-            input = context.config
-        };
-
+        var input = new NovelAIinput(engine, @params, context.config);
 
         var results = await novelAI.GenerateRequest(BotClient, CharId, Message, input);
         using var stream = results.Single();

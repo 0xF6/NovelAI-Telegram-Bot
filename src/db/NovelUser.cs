@@ -1,4 +1,5 @@
 ﻿using Google.Cloud.Firestore;
+using nai.nai;
 
 namespace nai.db;
 
@@ -17,12 +18,20 @@ public class NovelUser
     public bool IsAdmin { get; set; }
     [FirestoreProperty]
     public string? TgLogin { get; set; }
+    [FirestoreProperty]
+    public string? SelectedEngine { get; set; }
 
 
     public async ValueTask GrantCoinsAsync(NovelUserAssets asset, float coins)
     {
         if (asset == NovelUserAssets.CRYSTAL)
             CrystalCoin += coins;
+        await Db.SaveUser(this);
+    }
+
+    public async ValueTask SetActiveEngine(NovelAIEngine engine)
+    {
+        SelectedEngine = engine.key;
         await Db.SaveUser(this);
     }
 
@@ -38,4 +47,11 @@ public class NovelUser
             NovelUserAssets.CRYSTAL => IsAllowExecute(price),
             _ => false
         };
+
+    public NovelAIEngine GetSelectedEngine(NaiSettings settings)
+    {
+        if (SelectedEngine == null)
+            return NovelAIEngine.ByKey(settings.DefaultModel);
+        return NovelAIEngine.ByKey(SelectedEngine);
+    }
 }
