@@ -19,6 +19,7 @@
 - [ ] Ability to disable 'pay to generate'
 - [ ] Ability to support extend quenue (with multiple NovelAI accounts)
 - [ ] Support authorization by username\password
+- [ ] Docker support
 
 ## Setup 
 
