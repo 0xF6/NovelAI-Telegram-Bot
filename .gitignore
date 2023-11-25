@@ -353,3 +353,6 @@ MigrationBackup/
 Properties/launchSettings.json
 
 src/Properties/launchSettings.json
+
+!bin/*
+*.db
