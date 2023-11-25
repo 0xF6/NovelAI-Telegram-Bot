@@ -6,8 +6,6 @@ public class WallPaperGenCommand : ImageGenCommand
     {
         "/wallpaper"
     };
-    protected override bool IsSfw() => false;
-
     protected override ValueTask OnFillAdditionalData(NovelAIinput input)
     {
         input.parameters.sm = true;
