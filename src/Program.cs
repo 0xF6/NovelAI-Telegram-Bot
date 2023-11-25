@@ -1,4 +1,4 @@
-﻿using nai;
+using nai;
 using nai.commands;
 using nai.commands.images;
 using nai.db;
@@ -145,14 +145,14 @@ async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, Cancellation
 
     
     var entity = message.Entities?.FirstOrDefault();
-    var entityVal = message.EntityValues?.FirstOrDefault()?.Split('@').FirstOrDefault();
+    var entityVal = message.EntityValues?.FirstOrDefault();
 
     // skip not bot command
     if (entity?.Type is not MessageEntityType.BotCommand)
         return;
 
     var user = await Db.GetUser(message.From!);
-    var command = commands.FirstOrDefault(x => x.Aliases.Contains(entityVal!))?.Create();
+    var command = commands.FirstOrDefault(x => x.Aliases.Any(x => entityVal!.Contains(x)))?.Create();
 
     if (command is ISetterContext setter) 
         setter.Set(message, user, botClient);
