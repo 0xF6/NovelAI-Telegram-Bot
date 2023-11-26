@@ -356,3 +356,5 @@ src/Properties/launchSettings.json
 
 !bin/*
 *.db
+
+src/.env

@@ -1,0 +1,17 @@
+version: '3'
+services:
+  nai_bot:
+    container_name: nai_bot
+    image: ghcr.io/0xf6/novelai-telegram-bot:master
+    environment:
+      TelegramBotToken: ""
+      Nai__AuthToken: ""
+      MainAdministrator: ""
+      Database__LiteDB__IsActive: "true"
+      Database__LiteDB__ConnectionString: "db/nai.db"
+    volumes:
+      - nai:/app/images
+      - nai:/app/actions
+      - nai:/app/db
+volumes:
+  nai: {}
