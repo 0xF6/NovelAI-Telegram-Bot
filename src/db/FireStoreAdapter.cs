@@ -1,11 +1,21 @@
 ﻿namespace nai.db;
 
 using Google.Cloud.Firestore;
+using Google.Cloud.Firestore.V1;
 
-public class FireStoreAdapter(FireStoreConnectionString path) : IDbAdapter
+public class FireStoreAdapter : IDbAdapter
 {
-    private FirestoreDb db { get; } = FirestoreDb.Create(path.ProjectId);
-    public ICollectionReference Nai => new FireStoreCollectionReference(db.Collection(path.InitialCollection));
+    private readonly FireStoreConnectionString _path;
+
+    public FireStoreAdapter(FireStoreConnectionString path)
+    {
+        _path = path;
+        var builder = new FirestoreClientBuilder { JsonCredentials = Config.GetDbCredentials(Db.DbKind.Firestore) };
+        this.db = FirestoreDb.Create(path.ProjectId, builder.Build());
+    }
+
+    private FirestoreDb db { get; } 
+    public ICollectionReference Nai => new FireStoreCollectionReference(db.Collection(_path.InitialCollection));
 }
 
 public readonly struct FireStoreConnectionString(string path)

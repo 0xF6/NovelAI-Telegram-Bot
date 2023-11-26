@@ -9,6 +9,7 @@ Database:
     IsActive: false
     ConnectionString: ProjectId://nai
     CredentialPath: 
+    CredentialBase64: 
   LiteDB:
     IsActive: true
     ConnectionString: nai.db

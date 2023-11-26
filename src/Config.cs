@@ -1,4 +1,5 @@
-﻿using nai.commands;
+﻿using System.Text;
+using nai.commands;
 using nai.nai;
 
 namespace nai;
@@ -66,6 +67,22 @@ public static class Config
     public static bool IsDbActive(Db.DbKind kind)
         => bool.Parse(Root.GetSection("Database").GetSection(kind.ToString()).GetSection("IsActive").Value!);
 
+    public static string GetDbCredentials(Db.DbKind kind)
+    {
+        if (kind == Db.DbKind.LiteDb)
+            throw new NotSupportedException();
+        var dbSection = Root.GetSection("Database").GetSection(kind.ToString());
+
+        var path = dbSection.GetSection("CredentialPath").Value;
+        var base64 = dbSection.GetSection("CredentialBase64").Value;
+
+
+        if (!string.IsNullOrEmpty(path))
+            return File.ReadAllText(path);
+        if (!string.IsNullOrEmpty(base64))
+            return Encoding.UTF8.GetString(Convert.FromBase64String(base64));
+        throw new Exception($"No defined correct credential, CredentialPath and CredentialBase64 is null");
+    }
 
     public static NaiSettings GetNaiSettings()
     {
