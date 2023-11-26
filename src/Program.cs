@@ -135,7 +135,14 @@ async Task HandleUpdateAsync(ITelegramBotClient bot, Update update, Cancellation
     if (message.Text is not { } messageText)
         return;
     if (update.Message?.From?.Username is not { })
+    {
+        await bot.SendTextMessageAsync(
+            chatId: update.Message.Chat.Id,
+            replyToMessageId: update.Message.MessageId,
+            text: "No username on your account, please define username in settings and try again",
+            cancellationToken: cancellationToken);
         return;
+    }
 
     if (!messageText.StartsWith("/"))
         return;
