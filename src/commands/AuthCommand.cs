@@ -46,7 +46,7 @@ public class AuthCommand : Command, IKeyboardProcessor
         }
 
 
-        await BotClient.SendTextMessageAsync(Config.MainAdministrator, $"Запрос авторизации от \\@{Message.From!.Username} \\([User {Message.From!.FirstName} {Message.From!.LastName}](tg://user?id={Message.From!.Id})\\)\nCode: {allowedKey}", parseMode:ParseMode.MarkdownV2, cancellationToken: ct);
+        await BotClient.SendTextMessageAsync(Config.MainAdministrator, $"Запрос авторизации от <a href=\"tg://user?id={Message.From.Id}\">{Message.From!.FirstName} {Message.From!.LastName}</a>\nCode: {allowedKey}", parseMode:ParseMode.Html, cancellationToken: ct);
 
         Shuffle(keys);
 
