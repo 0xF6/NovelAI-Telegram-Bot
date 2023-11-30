@@ -19,14 +19,28 @@
 - [ ] Ability to disable 'pay to generate'
 - [ ] Ability to support extend quenue (with multiple NovelAI accounts)
 - [ ] Support authorization by username\password
-- [ ] Docker support
+- [x] Docker support
 
 ## Setup 
 
+
+### classic run
 Install `.NET 8.0`         
-Set `TelegramBotToken`, `Nai:AuthToken` (see about authorization), `MainAdministrator` in bin/config.yaml      
+Clone repo
+Set `TelegramBotToken`, `Nai:AuthToken` (see about authorization), `MainAdministrator` in `bin/config.yaml`       
 Execute `bin/run.ps1` or `bin/run.sh`     
 Complete! ✨✨✨    
+
+
+### docker run
+
+```sh
+docker compose up
+```
+Complete! ✨✨✨    
+
+
+---
 
     
 About 💎, its direct of Anlas in your novel ai account (btw, crystal formula calculation does not have 100% accuracy), according to this, distribute between users more carefully    
