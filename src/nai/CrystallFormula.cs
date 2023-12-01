@@ -1,4 +1,4 @@
-﻿namespace nai.nai;
+﻿namespace nai;
 
 using Expressive.Expressions;
 using Expressive.Functions;

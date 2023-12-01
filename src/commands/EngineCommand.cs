@@ -1,14 +1,14 @@
-﻿using nai.i18n;
-using nai.nai;
+﻿namespace nai.commands;
+
+using i18n;
+using nai;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 
-namespace nai.commands;
 
 public class EngineCommand : Command
 {
-    public override List<string> Aliases
-        => new() { "/engine" };
+    public override string Aliases => "engine";
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
     {
         if (string.IsNullOrEmpty(cmdText))
@@ -33,7 +33,7 @@ public class EngineCommand : Command
         }
 
         var engine = NovelAIEngine.ByKey(cmdText);
-        await User.SetActiveEngine(engine);
+        await User.SetActiveEngine(Db, engine);
 
         await BotClient.SendTextMessageAsync(
             chatId: CharId,

@@ -1,12 +1,11 @@
-﻿using nai;
-using nai.db;
-using nai.i18n;
+﻿namespace nai;
+
+using i18n;
 using Telegram.Bot;
 
 public class GrantBalanceCommand : Command
 {
-    public override List<string> Aliases
-        => new() { "/grant" };
+    public override string Aliases => "grant";
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
     {
         if (!float.TryParse(cmdText, out var balance))
@@ -17,7 +16,7 @@ public class GrantBalanceCommand : Command
         var tgUser = Message.ReplyToMessage!.From;
         var toUser = await Db.GetUser(tgUser!);
 
-        await toUser.GrantCoinsAsync(NovelUserAssets.CRYSTAL, balance);
+        await toUser.GrantCoinsAsync(Db, balance);
         
         await BotClient.SendTextMessageAsync(
             chatId: CharId,

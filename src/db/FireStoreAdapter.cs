@@ -7,10 +7,10 @@ public class FireStoreAdapter : IDbAdapter
 {
     private readonly FireStoreConnectionString _path;
 
-    public FireStoreAdapter(FireStoreConnectionString path)
+    public FireStoreAdapter(FireStoreConnectionString path, Config config)
     {
         _path = path;
-        var builder = new FirestoreClientBuilder { JsonCredentials = Config.GetDbCredentials(Db.DbKind.Firestore) };
+        var builder = new FirestoreClientBuilder { JsonCredentials = config.GetDbCredentials(Db.DbKind.Firestore) };
         this.db = FirestoreDb.Create(path.ProjectId, builder.Build());
     }
 

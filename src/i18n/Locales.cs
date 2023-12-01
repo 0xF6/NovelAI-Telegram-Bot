@@ -12,4 +12,5 @@ public static class Locales
     public const string EngineHasSwitched = nameof(LocaleContract.EngineHasSwitched);
     public const string ActiveEngine = nameof(LocaleContract.ActiveEngine);
     public const string EngineNotFound = nameof(LocaleContract.EngineNotFound);
+    public const string EngineDisabled = nameof(LocaleContract.EngineDisabled);
 }

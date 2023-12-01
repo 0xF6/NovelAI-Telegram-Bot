@@ -1,9 +1,19 @@
 ﻿namespace nai;
 
-public class EngineQueue
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+public class EngineQueue(ILogger<EngineQueue> logger)
 {
+    public const string WithoutDelay = "none";
+    public const string ImageGeneration = "image";
+    public const string Payment = "payment";
+
+
     public Queue<(string taskName, Func<Task> action)> actions = new();
-    public void Add(Func<Task> action, string taskName) => actions.Enqueue((taskName, action));
+    public void Add(Func<Task> action, string taskName) 
+        => actions.Enqueue((taskName, action));
 
 
     public async Task CycleAsync(CancellationToken ct)
@@ -15,21 +25,36 @@ public class EngineQueue
                 await Task.Delay(200, ct);
                 continue;
             }
+
             var (name, task) = actions.Dequeue();
+            using var scope = logger.BeginScope("Execution task '{name}'", name);
+
             try
             {
-                Console.WriteLine($"Start execute task '{name}'");
                 await task();
-                Console.WriteLine($"Success execute task '{name}'");
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Failed execute task '{name}'");
-                Console.WriteLine(e);
+                logger.LogCritical(e, "failed execute task '{name}'", name);
             }
-            Console.WriteLine($"Wait...");
             await Task.Delay(5000, ct);
-            Console.WriteLine($"Success wait...");
         }
     }
 }
+
+
+public class EngineQueueWorker(EngineQueue queue) : BackgroundService
+{
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        => queue.CycleAsync(stoppingToken);
+}
+public static class QueueServices
+{
+    public static IServiceCollection UseQueue(this IServiceCollection collection)
+    {
+        collection.AddHostedService<EngineQueueWorker>();
+        collection.AddSingleton<EngineQueue>();
+        return collection;
+    }
+}
+

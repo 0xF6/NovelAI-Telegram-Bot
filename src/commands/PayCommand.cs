@@ -1,12 +1,12 @@
-﻿using nai.db;
-using nai.i18n;
-using Telegram.Bot;
+﻿namespace nai.commands;
 
-namespace nai.commands;
+using db;
+using i18n;
+using Telegram.Bot;
 
 public class PayCommand : Command
 {
-    public override List<string> Aliases => new() { "/pay" };
+    public override string Aliases => "pay";
 
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
     {
@@ -36,8 +36,8 @@ public class PayCommand : Command
             text: $"@{loginFrom} payed @{loginTo} {balance}{NovelUserAssets.CRYSTAL.GetEmojiFor()}",
             cancellationToken: ct);
 
-        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -balance);
-        await toUser.GrantCoinsAsync(NovelUserAssets.CRYSTAL, balance);
+        await User.GrantCoinsAsync(Db, -balance);
+        await toUser.GrantCoinsAsync(Db, balance);
     }
 }
 

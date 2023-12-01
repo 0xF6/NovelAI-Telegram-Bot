@@ -1,5 +1,4 @@
 ﻿using nai;
-using nai.nai;
 using Newtonsoft.Json;
 
 public record NovelAIParams

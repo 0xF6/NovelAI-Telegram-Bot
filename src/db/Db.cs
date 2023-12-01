@@ -1,16 +1,17 @@
-﻿using System.Numerics;
+﻿namespace nai.db;
+
+using System.Numerics;
 using Google.Cloud.Firestore;
-using nai.nai;
+using nai;
 using Telegram.Bot.Types;
 
-namespace nai.db;
 
-public class Db
+public class Db(Config config)
 {
-    private static State? _state;
-    private static bool isLoaded = false;
-    public static State State => _state;
-    private static IDbAdapter _adapter;
+    private State? _state;
+    private bool isLoaded = false;
+    public State State => _state;
+    private IDbAdapter _adapter;
 
     public enum DbKind
     {
@@ -18,14 +19,14 @@ public class Db
         LiteDb
     }
 
-    public static async ValueTask<State> LoadState()
+    public async ValueTask<State> LoadState()
     {
         if (isLoaded) return _state;
 
-        if (Config.IsDbActive(DbKind.Firestore))
-            _adapter = new FireStoreAdapter(Config.GetDbPath(DbKind.Firestore));
+        if (config.IsDbActive(DbKind.Firestore))
+            _adapter = new FireStoreAdapter(config.GetDbPath(DbKind.Firestore), config);
         else
-            _adapter = new LiteDbAdapter(Config.GetDbPath(DbKind.LiteDb));
+            _adapter = new LiteDbAdapter(config.GetDbPath(DbKind.LiteDb));
 
 
         _state = new State();
@@ -44,26 +45,26 @@ public class Db
         return _state;
     }
 
-    public static async ValueTask<NovelUser> GetUser(User user)
+    public async ValueTask<NovelUser> GetUser(User user)
         => State.Users.FirstOrDefault(x => x.Id == user.Id) ?? await AddUser(user);
 
-    public static async ValueTask RefreshUser(User user)
+    public async ValueTask RefreshUser(User user)
     {
         var u = await GetUser(user);
         u.TgLogin = user.Username;
         await SaveUser(u);
     }
 
-    public static bool ChatIsAllowed(long chat)
+    public bool ChatIsAllowed(long chat)
         => _state.AllowedChatList.Any(x => x == chat);
 
-    public static async ValueTask AddAllowedChat(long chat)
+    public async ValueTask AddAllowedChat(long chat)
     {
         _state.AllowedChatList.Add(chat);
         await _adapter.Nai.Document("chats").SetAsync(new { data = _state.AllowedChatList }, SetOptions.Overwrite);
     }
 
-    private static async ValueTask<NovelUser> AddUser(User u)
+    private async ValueTask<NovelUser> AddUser(User u)
     {
         var user = new NovelUser(u.Id)
         {
@@ -75,13 +76,13 @@ public class Db
     }
 
 
-    public static long CalculatePrice(NovelAIEngine engine, NovelAIParams @params)
+    public long CalculatePrice(NovelAIEngine engine, NovelAIParams @params)
     {
-        var formula = new CrystallFormula(Config.CrystallFormula);
+        var formula = new CrystallFormula(config.CrystallFormula);
         return formula.GetPrice(engine, @params.steps, new Vector2(@params.width, @params.height));
     }
     
-    public static async ValueTask SaveUser(NovelUser novelUser)
+    public async ValueTask SaveUser(NovelUser novelUser)
     {
         if (novelUser.TgLogin is null)
             return;

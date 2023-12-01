@@ -1,4 +1,4 @@
-﻿using nai.nai;
+﻿using nai;
 
 public record NovelAIinput(string model, NovelAIParams parameters, string input)
 {

@@ -1,21 +1,15 @@
-﻿using Flurl.Http;
-using nai.db;
-using nai.nai;
-using RandomGen;
+﻿namespace nai.commands;
+
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace nai.commands;
 
 public class EnhanceCommand : Command, IKeyboardProcessor
 {
-    public override List<string> Aliases => new()
-    {
-        "/enhance",
-    };
+    public override string Aliases => "enhance";
 
-    public override string QueueName => "image_generation";
+    public override string QueueName => EngineQueue.ImageGeneration;
 
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
     {
@@ -27,7 +21,7 @@ public class EnhanceCommand : Command, IKeyboardProcessor
     {
         var settings = Config.GetNaiSettings();
         var engine = User.GetSelectedEngine(settings);
-        var novelAI = new NovelAI();
+        var novelAI = new NovelAI(Config);
 
         var @params = NovelAIParams.Create(settings, engine, context.seed);
 
@@ -65,7 +59,7 @@ public class EnhanceCommand : Command, IKeyboardProcessor
 
         await System.IO.File.WriteAllBytesAsync($"{context.pngPath}.enhanced.png", stream.ToArray());
 
-        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -context.price);
+        await User.GrantCoinsAsync(Db, -context.price);
     }
 
     public KeyboardAction Action => KeyboardAction.Enhance;

@@ -1,23 +1,20 @@
-﻿using nai.db;
-using nai.i18n;
+﻿namespace nai.commands;
+
+using Microsoft.Extensions.Logging;
+using i18n;
 using Telegram.Bot;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
-namespace nai.commands;
 
 public class AuthCommand : Command, IKeyboardProcessor
 {
     public override bool IsTrusted => false;
 
-    public override List<string> Aliases => new()
-    {
-        "/authorize_chat"
-    };
+    public override string Aliases => "authorize_chat";
+    public override string QueueName => EngineQueue.WithoutDelay;
 
-    public override string QueueName => "none";
-
-    public static List<string> Keys = new List<string>()
+    public static List<string> Keys = new()
     {
         "⭐️",
         "✨",
@@ -31,17 +28,19 @@ public class AuthCommand : Command, IKeyboardProcessor
         if (Message.From is null)
             return;
 
-        Console.WriteLine($"CHAT AUTH DATA: ");
+        using var _ = Logger.BeginScope("Chat auth");
+
+
         var keys = Keys.ToArray().ToList();
         Shuffle(keys);
         var allowedKey = string.Join(" ", keys);
         var allowedKeyArr = allowedKey.Split(' ').ToArray();
         
-        Console.WriteLine(allowedKey);
+        Logger.LogWarning("Chat auth data: '{code}'", allowedKey);
 
         if (Config.MainAdministrator == 0)
         {
-            Console.WriteLine($"No main administrator has been defined");
+            Logger.LogCritical("No main administrator has been defined");
             return;
         }
 
@@ -137,7 +136,6 @@ public class AuthCommand : Command, IKeyboardProcessor
             {
                 await BotClient.EditMessageTextAsync(chatId, Message.MessageId, Locale.Get(Locales.AuthFailed));
                 await context.TrimAsync();
-                return;
             }
         }
     }

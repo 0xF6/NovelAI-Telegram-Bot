@@ -1,26 +1,23 @@
 ﻿namespace nai.i18n;
 
 using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
+using Microsoft.Extensions.Logging;
 
-public class Localization
+public class Localization(Config config, ILogger<Localization> logger)
 {
-    private readonly string _code;
-
-    public Localization(string code) => _code = code;
+    private bool isLoaded => _locales.Any();
 
     public string Get(string key)
-        => FetchContract(_code).Get(key);
+        => FetchContract(config.DefaultLocale).Get(key);
     public string Get(string key, params object[] args)
-        => string.Format(FetchContract(_code).Get(key), args);
+        => string.Format(FetchContract(config.DefaultLocale).Get(key), args);
 
 
-    private static readonly Dictionary<string, LocaleContract> _locales = new();
+    private readonly Dictionary<string, LocaleContract> _locales = new();
 
-    public void Load()
+    private void Load()
     {
-        if (_locales.Any())
-            return;
+        if (isLoaded) return;
 
         var dir = new DirectoryInfo("./locales");
 
@@ -32,13 +29,16 @@ public class Localization
             var all = File.ReadAllText(file.FullName);
             var contract = deserializer.Deserialize<LocaleContract>(all);
             _locales.Add(file.Name.Replace(file.Extension, ""), contract);
-            Console.WriteLine($"Loaded '{file.Name}'");
+            logger.LogInformation("Loaded {localeName}", file.Name);
         }
     }
 
 
     public ILocaleContract FetchContract(string key)
     {
+        if (!isLoaded)
+            Load();
+
         if (_locales.TryGetValue(key, out var contract))
             return contract;
         return _locales["en-US"];

@@ -1,22 +1,18 @@
-﻿using Flurl.Http;
-using nai.db;
-using nai.nai;
-using RandomGen;
+﻿namespace nai.commands;
+
+using Microsoft.Extensions.Logging;
+using db;
+using nai;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using File = System.IO.File;
-using nai.i18n;
+using i18n;
 
-namespace nai.commands;
 
 public class VariationsCommand : Command, IKeyboardProcessor
 {
-    public override List<string> Aliases => new()
-    {
-        "/variations"
-    };
-    public override string QueueName => "image_generation";
+    public override string Aliases => "variations";
+    public override string QueueName => EngineQueue.ImageGeneration;
 
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
     {
@@ -54,10 +50,11 @@ public class VariationsCommand : Command, IKeyboardProcessor
                 cancellationToken: ct);
             return;
         }
-        Console.WriteLine($"Start variations {User.TgLogin}");
-        
 
-        var novelAI = new NovelAI();
+        Logger.LogDebug("Start variations by '{username}'", User.TgLogin);
+
+
+        var novelAI = new NovelAI(Config);
         var disposable = new List<MemoryStream>();
         var files = new List<InputMediaDocument>();
 
@@ -73,8 +70,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
             foreach (var (stream, i) in result.Select((x, i) => (x, i)))
             {
                 files.Add(new InputMediaDocument(InputFile.FromStream(stream, $"{aIinput.parameters.seed}-{i}.png")));
-                Console.WriteLine($"Generated {aIinput.parameters.seed}-{i}.png");
-
+                Logger.LogDebug($"Generated {aIinput.parameters.seed}-{i}.png");
             }
             await Task.Delay(3000, ct);
             index++;
@@ -91,7 +87,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
             $"Variation generated\npaid {totalPrice} 💎",
             parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId, cancellationToken: ct);
 
-        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -totalPrice);
+        await User.GrantCoinsAsync(Db, -totalPrice);
 
         foreach (var stream in disposable) await stream.DisposeAsync();
 
@@ -105,7 +101,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
         var seedFormula = new SeedFormula(settings.SeedFormula);
 
 
-        var novelAI = new NovelAI();
+        var novelAI = new NovelAI(Config);
 
         var seed = seedFormula.GetSeed();
         var @params = NovelAIParams.Create(settings, engine, seed);
@@ -130,7 +126,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
             foreach (var (stream, i) in entities.Select((x, i) => (x, i)))
             {
                 toDispose.Add(stream);
-                await File.WriteAllBytesAsync($"{context.pngPath}.variant.{i}.png", stream.ToArray());
+                await System.IO.File.WriteAllBytesAsync($"{context.pngPath}.variant.{i}.png", stream.ToArray());
                 files.Add(new InputMediaDocument(InputFile.FromStream(stream, $"{context.seed}.variant.{i}.png")));
             }
 
@@ -158,7 +154,7 @@ public class VariationsCommand : Command, IKeyboardProcessor
                     parseMode: ParseMode.MarkdownV2, replyToMessageId: msg.First().MessageId);
             }
 
-            await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL, -context.price);
+            await User.GrantCoinsAsync(Db, -context.price);
         }
         finally
         {

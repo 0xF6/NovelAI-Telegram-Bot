@@ -34,6 +34,7 @@
 		<PackageReference Include="Telegram.Bot" Version="19.0.0" />
 		<PackageReference Include="Flurl.Http" Version="3.2.4" />
 		<PackageReference Include="RandomGen" Version="1.1.6" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 	</ItemGroup>
 
 </Project>

@@ -1,14 +1,12 @@
-﻿using Flurl.Http;
+﻿namespace nai;
+
+using Flurl.Http;
 using Ionic.Zip;
-using nai.db;
 using System.IO;
 using Newtonsoft.Json;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-
-namespace nai.nai;
-
 
 public record NovelAIEngine(string key, long minPrice, long maxPrice, bool isActual)
 {
@@ -28,10 +26,9 @@ public record NovelAIEngine(string key, long minPrice, long maxPrice, bool isAct
         {
             return All.First(x => x.key.Equals(key, StringComparison.InvariantCultureIgnoreCase));
         }
-        catch
+        catch (Exception e) 
         {
-            Console.WriteLine($"Error when finding '{key}' in All");
-            throw;
+            throw new Exception($"Error when finding '{key}' in All", e);
         }
     }
 
@@ -42,26 +39,32 @@ public record NovelAIEngine(string key, long minPrice, long maxPrice, bool isAct
 
 public class NovelAI
 {
+    private readonly Config _config;
     public FlurlClient flurl;
 
-    public NovelAI()
+    public NovelAI(Config config)
     {
-        var settings = Config.GetNaiSettings();
-        flurl = new FlurlClient(settings.GenerationUrl);
+        _config = config;
+        var settings = config.GetNaiSettings();
+        flurl = new FlurlClient(settings.BaseDomainUrl);
 
         flurl.WithHeader("Authorization",
             $"Bearer {settings.AuthToken}");
     }
 
 
-    public IFlurlRequest Request()
-        => flurl.Request();
+    public IFlurlRequest Request(string url)
+        => flurl.Request(url);
+
+
+    public Task<NovelAiUserData> GetUserData(CancellationToken ct = default) 
+        => flurl.Request("/user/data").GetJsonAsync<NovelAiUserData>(ct);
 
 
     public async Task<List<MemoryStream>> GenerateRequest(ITelegramBotClient botClient, long chatId, Message message, NovelAIinput input, CancellationToken ct = default)
     {
         var result = await this
-            .Request()
+            .Request("/ai/generate-image")
             .AllowAnyHttpStatus()
             .PostJsonAsync(input, cancellationToken: ct);
 
@@ -76,7 +79,7 @@ public class NovelAI
             return new List<MemoryStream>();
         }
 
-        if (Config.DebugRequests)
+        if (_config.DebugRequests)
         {
             await botClient.SendTextMessageAsync(
                 chatId: chatId,
@@ -96,7 +99,6 @@ public class NovelAI
         {
             await using var reader = e.OpenReader();
             var stream = new MemoryStream();
-            Console.WriteLine($"Received {e.FileName}");
 
             await reader.CopyToAsync(stream, ct);
 
@@ -107,4 +109,72 @@ public class NovelAI
         }
         return list;
     }
+}
+
+public class Information
+{
+    public bool emailVerified { get; set; }
+    public bool emailVerificationLetterSent { get; set; }
+    public bool trialActivated { get; set; }
+    public int trialActionsLeft { get; set; }
+    public int trialImagesLeft { get; set; }
+    public int accountCreatedAt { get; set; }
+}
+
+public class Keystore
+{
+    public string keystore { get; set; }
+    public int changeIndex { get; set; }
+}
+
+public class Perks
+{
+    public int maxPriorityActions { get; set; }
+    public int startPriority { get; set; }
+    public int moduleTrainingSteps { get; set; }
+    public bool unlimitedMaxPriority { get; set; }
+    public bool voiceGeneration { get; set; }
+    public bool imageGeneration { get; set; }
+    public bool unlimitedImageGeneration { get; set; }
+    public List<UnlimitedImageGenerationLimit> unlimitedImageGenerationLimits { get; set; }
+    public int contextTokens { get; set; }
+}
+
+public class Priority
+{
+    public int maxPriorityActions { get; set; }
+    public int nextRefillAt { get; set; }
+    public int taskPriority { get; set; }
+}
+
+public class NovelAiUserData
+{
+    public Priority priority { get; set; }
+    public Subscription subscription { get; set; }
+    public Keystore keystore { get; set; }
+    public string settings { get; set; }
+    public Information information { get; set; }
+}
+
+public class Subscription
+{
+    public int tier { get; set; }
+    public bool active { get; set; }
+    public int expiresAt { get; set; }
+    public Perks perks { get; set; }
+    public object paymentProcessorData { get; set; }
+    public TrainingStepsLeft trainingStepsLeft { get; set; }
+    public int accountType { get; set; }
+}
+
+public class TrainingStepsLeft
+{
+    public int fixedTrainingStepsLeft { get; set; }
+    public int purchasedTrainingSteps { get; set; }
+}
+
+public class UnlimitedImageGenerationLimit
+{
+    public int resolution { get; set; }
+    public int maxPrompts { get; set; }
 }

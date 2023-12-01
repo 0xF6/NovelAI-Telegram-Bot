@@ -1,17 +1,14 @@
-﻿using System.Text.RegularExpressions;
-using RandomGen;
-using Telegram.Bot;
-using static Google.Rpc.Context.AttributeContext.Types;
+﻿namespace nai.commands;
 
-namespace nai.commands;
+using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
+using Telegram.Bot;
 
 public class Img2ImgP : ImageGenCommand
 {
-    public override List<string> Aliases => new()
-    {
-        "/img2imgp"
-    };
-    
+    public override string Aliases => "img2imgp";
+
+
     protected override (int x, int y) GetSize() => (512, 768);
 
     protected override async ValueTask OnFillAdditionalData(NovelAIinput input)
@@ -29,7 +26,7 @@ public class Img2ImgP : ImageGenCommand
             var power = powerRegex.Match(input.input.Replace('\n', ' '));
             input.parameters.strength = float.Parse(power.Groups[1].Value) - 0.01f;
             input = input with { input = input.input.Replace(power.Groups[0].Value, "") };
-            Console.WriteLine($"Success parsed power from input, power: {input.parameters.strength}");
+            Logger.LogDebug("Success parsed power from input, power: {power}", input.parameters.strength);
         }
         else
             input.parameters.strength = 0.53f;
@@ -41,7 +38,7 @@ public class Img2ImgP : ImageGenCommand
             var noise = noiseRegex.Match(input.input.Replace('\n', ' '));
             input.parameters.noise = float.Parse(noise.Groups[1].Value) - 0.01f;
             input = input with { input = input.input.Replace(noise.Groups[0].Value, "") };
-            Console.WriteLine($"Success parsed noise from input, noise: {input.parameters.noise}");
+            Logger.LogDebug("Success parsed noise from input, noise: {noise}", input.parameters.noise);
         }
         else
             input.parameters.noise = 0.05f;

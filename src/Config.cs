@@ -1,33 +1,14 @@
-using System.Text;
+﻿using System.Text;
 using nai.commands;
-using nai.nai;
-
 namespace nai;
 
 using Microsoft.Extensions.Configuration;
 using System.Runtime.CompilerServices;
 using db;
 
-public static class Config
+public class Config(IConfiguration Root)
 {
-    public static void Init()
-    {
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(new DirectoryInfo("./").FullName)
-            .AddYamlFile("config.yml")
-            .AddEnvironmentVariables();
-        Root = builder.Build();
-
-
-        var db = Root.GetSection("Database");
-
-        var asd = db.GetSection("Firestore");
-    }
-
-    public static IConfigurationRoot Root;
-
-
-    private static string GetValue([CallerMemberName] string? key = null)
+    private string GetValue([CallerMemberName] string? key = null)
     {
         if (key is null)
             throw new ArgumentNullException(nameof(key));
@@ -41,18 +22,18 @@ public static class Config
     }
 
 
-    public static string TelegramBotToken => GetValue();
-    public static bool DebugRequests => bool.Parse(GetValue());
+    public string TelegramBotToken => GetValue();
+    public bool DebugRequests => bool.Parse(GetValue());
 
-    public static bool ModeOfChannel => bool.Parse(GetValue());
+    public bool ModeOfChannel => bool.Parse(GetValue());
 
-    public static long MainAdministrator => long.Parse(GetValue());
+    public long MainAdministrator => long.Parse(GetValue());
 
-    public static string CrystallFormula => Root.GetSection("Nai").GetSection("CrystallFormula").Value;
-    public static string NovelAiEngine => Root.GetSection("Nai").GetSection("SelectedModel").Value;
-    public static string DefaultLocale => GetValue();
+    public string CrystallFormula => Root.GetSection("Nai").GetSection("CrystallFormula").Value;
+    public string NovelAiEngine => Root.GetSection("Nai").GetSection("SelectedModel").Value;
+    public string DefaultLocale => GetValue();
 
-    public static bool CommandIsActive(Command command)
+    public bool CommandIsActive(Command command)
     {
         try
         {
@@ -64,10 +45,10 @@ public static class Config
         }
     }
 
-    public static bool IsDbActive(Db.DbKind kind)
+    public bool IsDbActive(Db.DbKind kind)
         => bool.Parse(Root.GetSection("Database").GetSection(kind.ToString()).GetSection("IsActive").Value!);
 
-    public static string GetDbCredentials(Db.DbKind kind)
+    public string GetDbCredentials(Db.DbKind kind)
     {
         if (kind == Db.DbKind.LiteDb)
             throw new NotSupportedException();
@@ -84,27 +65,28 @@ public static class Config
         throw new Exception($"No defined correct credential, CredentialPath and CredentialBase64 is null");
     }
 
-    public static NaiSettings GetNaiSettings()
+    public  NaiSettings GetNaiSettings()
     {
         var settings = new NaiSettings();
         Root.GetSection("nai").Bind(settings, x => x.ErrorOnUnknownConfiguration = true);
         return settings;
     }
 
-    public static InvoiceConfig GetInvoiceConfig()
+    public InvoiceConfig GetInvoiceConfig()
     {
         var config = new InvoiceConfig();
         Root.GetSection("invoice").Bind(config, x => x.ErrorOnUnknownConfiguration = true);
         return config;
     }
 
-    public static string GetDbPath(Db.DbKind kind)
+    public string GetDbPath(Db.DbKind kind)
         => Root.GetSection("Database").GetSection(kind.ToString()).GetSection("ConnectionString").Value!;
 }
 
 public class NaiSettings
 {
     public string GenerationUrl { get; set; }
+    public string BaseDomainUrl { get; set; }
     public string AuthToken { get; set; }
     public string CrystallFormula { get; set; }
     public string EnhanceFormula { get; set; }

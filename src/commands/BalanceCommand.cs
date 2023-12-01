@@ -3,8 +3,7 @@ using Telegram.Bot;
 
 public class BalanceCommand : Command
 {
-    public override List<string> Aliases
-        => new() { "/balance" };
+    public override string Aliases => "balance";
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
     {
         await BotClient.SendTextMessageAsync(

@@ -1,8 +1,7 @@
+﻿namespace nai;
+
 using System.Text.RegularExpressions;
-using nai;
-using nai.db;
-using nai.i18n;
-using nai.nai;
+using i18n;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -12,7 +11,7 @@ using File = System.IO.File;
 
 public abstract class ImageGenCommand : Command
 {
-    public override string QueueName => "image_generation";
+    public override string QueueName => EngineQueue.ImageGeneration;
 
     protected abstract (int x, int y) GetSize();
     
@@ -96,7 +95,7 @@ public abstract class ImageGenCommand : Command
         if (!await OnValidate())
             return;
 
-        var novelAI = new NovelAI();
+        var novelAI = new NovelAI(Config);
 
         if (engine.isActual) cmdText = $"{cmdText}, best quality, amazing quality, very aesthetic, absurdres";
 
@@ -142,7 +141,7 @@ public abstract class ImageGenCommand : Command
 
         await File.WriteAllTextAsync($"images/{User.Id}/{flsName}.png.msg", message.MessageId.ToString(), ct);
 
-        await User.GrantCoinsAsync(NovelUserAssets.CRYSTAL,-price);
+        await User.GrantCoinsAsync(Db,-price);
     }
 
     private InlineKeyboardButton CreateAction(string title, KeyboardAction action, long seed, string config, string pngPath, long price) =>

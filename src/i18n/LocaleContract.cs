@@ -12,4 +12,5 @@ public class LocaleContract : ILocaleContract
     public string EngineHasSwitched { get; set; }
     public string ActiveEngine { get; set; }
     public string EngineNotFound { get; set; }
+    public string EngineDisabled { get; set; }
 }

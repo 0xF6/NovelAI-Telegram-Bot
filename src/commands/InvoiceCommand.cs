@@ -1,15 +1,13 @@
 ﻿namespace nai.commands;
 
+using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types.Payments;
 using Telegram.Bot;
 
 public class InvoiceCommand : Command
 {
-    public override List<string> Aliases => new()
-    {
-        "/invoice"
-    };
-    public override string QueueName => "payment";
+    public override string Aliases => "invoice";
+    public override string QueueName => EngineQueue.Payment;
 
     public override async ValueTask ExecuteAsync(string cmdText, CancellationToken ct)
     {
@@ -41,12 +39,12 @@ public class InvoiceCommand : Command
             await BotClient.SendInvoiceAsync(CharId, "Purchase of currency", $"Purchase {crystals} 💎", $"{crystals}", payToken, payCurrency,
                 new LabeledPrice[]
                 {
-                    new LabeledPrice($"{crystals} 💎", input),
+                    new($"{crystals} 💎", input),
                 }, replyToMessageId: Message.MessageId, cancellationToken: ct);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Logger.LogCritical(e, "Failed to create order");
             await BotClient.SendTextMessageAsync(
                 chatId: CharId,
                 replyToMessageId: Message.MessageId,

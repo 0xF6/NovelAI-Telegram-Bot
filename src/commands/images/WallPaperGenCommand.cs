@@ -2,10 +2,7 @@
 
 public class WallPaperGenCommand : ImageGenCommand
 {
-    public override List<string> Aliases => new()
-    {
-        "/wallpaper"
-    };
+    public override string Aliases => "wallpaper";
     protected override ValueTask OnFillAdditionalData(NovelAIinput input)
     {
         input.parameters.sm = true;

@@ -1,5 +1,4 @@
 ﻿using Google.Cloud.Firestore;
-using nai.nai;
 
 namespace nai.db;
 
@@ -22,17 +21,16 @@ public class NovelUser
     public string? SelectedEngine { get; set; }
 
 
-    public async ValueTask GrantCoinsAsync(NovelUserAssets asset, float coins)
+    public ValueTask GrantCoinsAsync(Db db, float coins)
     {
-        if (asset == NovelUserAssets.CRYSTAL)
-            CrystalCoin += coins;
-        await Db.SaveUser(this);
+        CrystalCoin += coins;
+        return db.SaveUser(this);
     }
 
-    public async ValueTask SetActiveEngine(NovelAIEngine engine)
+    public ValueTask SetActiveEngine(Db db, NovelAIEngine engine)
     {
         SelectedEngine = engine.key;
-        await Db.SaveUser(this);
+        return db.SaveUser(this);
     }
 
     public bool IsAllowExecute(float priceCrystal)
