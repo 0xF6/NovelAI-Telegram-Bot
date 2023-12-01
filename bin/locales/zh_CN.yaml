@@ -25,3 +25,5 @@ ActiveEngine: >
     {1}
 EngineNotFound: |
     Engine '{0}' not registered    
+EngineDisabled:
+    Currently model `{0}` is disabled, use the `/engine` command to change your active model    

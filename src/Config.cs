@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using nai.commands;
 using nai.nai;
 
@@ -114,8 +114,17 @@ public class NaiSettings
     public string DefaultModel { get; set; }
     public Dictionary<string, ModelSettings> PerModel { get; set; }
 
+    public Dictionary<string, bool> ModelActive { get; set; }
+
     public ModelSettings For(NovelAIEngine engine) => PerModel[engine.key];
     public ModelSettings For(string engine) => PerModel[engine];
+
+    public bool IsActiveEngine(NovelAIEngine engine)
+    {
+        if (ModelActive.TryGetValue(engine.key, out var active))
+            return active;
+        return false;
+    }
 }
 
 public class ModelSettings

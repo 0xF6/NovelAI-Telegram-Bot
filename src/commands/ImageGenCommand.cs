@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using nai;
 using nai.db;
 using nai.i18n;
@@ -35,6 +35,19 @@ public abstract class ImageGenCommand : Command
 
         var settings = Config.GetNaiSettings();
         var engine = User.GetSelectedEngine(settings);
+
+
+        if (!settings.IsActiveEngine(engine))
+        {
+            await BotClient.SendTextMessageAsync(
+                chatId: CharId,
+                replyToMessageId: Message.MessageId,
+                text: Locale.Get(Locales.EngineDisabled, engine.key),
+                parseMode: ParseMode.Markdown,
+                cancellationToken: ct);
+            return;
+        }
+
         var seedFormula = new SeedFormula(settings.SeedFormula);
         var seed = seedFormula.GetSeed();
 

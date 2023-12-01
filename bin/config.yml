@@ -1,6 +1,5 @@
 ---
 TelegramBotToken:
-ModeOfChannel: false
 MainAdministrator:
 DefaultLocale: en-US
 DebugRequests: false
@@ -33,11 +32,13 @@ Commands:
   AuthCommand: true
   StartCommand: true
   EngineCommand: true
+  GetConfigCommand: true
 
 
 Nai:
     AuthToken:
     GenerationUrl: https://api.novelai.net/ai/generate-image
+    BaseDomainUrl: https://api.novelai.net/
     CrystallFormula: "round((map([step], 1, 50, [minAnlas], [maxAnlas]) + map([quality], 4096, 3145728, 2, 136)) / 2)"
     EnhanceFormula: "round(price + (price * 0.6))"
     VariationFormula: "price * 3"
@@ -50,6 +51,13 @@ Nai:
     # nai-diffusion-furry - NAI Diffusion Furry              -  5
     # nai-diffusion-2     - NAI Diffusion Anime V2           - 13
     # nai-diffusion-3     - NAI Diffusion Anime V3           - 30
+    ModelActive:
+        safe-diffusion: true
+        nai-diffusion: true
+        nai-diffusion-furry: true
+        nai-diffusion-2: true
+        nai-diffusion-3: true
+
     PerModel:
         default:
             inherit:
